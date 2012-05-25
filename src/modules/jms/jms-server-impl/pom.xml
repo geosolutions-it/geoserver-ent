@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>it.geosolutions.geoserver</groupId>
+		<artifactId>geoserver-modules</artifactId>
+		<version>2.1-SNAPSHOT</version>
+	</parent>
+
+	<groupId>it.geosolutions.geoserver</groupId>
+	<artifactId>jms-server-impl</artifactId>
+	<packaging>jar</packaging>
+	<version>${gs.version}</version>
+	<name>GeoServer JMS Server module Implementation</name>
+
+	<dependencies>
+		<dependency>
+			<groupId>it.geosolutions.geoserver</groupId>
+			<artifactId>jms-commons</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>it.geosolutions.geoserver</groupId>
+			<artifactId>jms-commons-impl</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>it.geosolutions.geoserver</groupId>
+			<artifactId>jms-server</artifactId>
+		</dependency>
+
+		<!-- http://jira.codehaus.org/browse/XSTR-571 -->
+		<dependency>
+			<groupId>com.thoughtworks.xstream</groupId>
+			<artifactId>xstream</artifactId>
+			<version>1.4</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.jms</groupId>
+			<artifactId>jms-api</artifactId>
+			<version>1.1-rev-1</version>
+		</dependency>
+		<!-- Needed to solve NamespaceHandler class org.apache.xbean.spring.context.v2.XBeanNamespaceHandler 
+			for namespace [http://activemq.apache.org/schema/core] not found ClassNotFoundException: 
+			org.apache.xbean.spring.context.v2.XBeanNamespaceHandler<br> ref: http://codebrane.com/blog/?p=823 -->
+		<dependency>
+			<groupId>org.apache.xbean</groupId>
+			<artifactId>xbean-spring</artifactId>
+			<version>3.5</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!-- ============================== -->
+		<!-- log4j -->
+		<!-- ============================== -->
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.14</version>
+		</dependency>
+		<!-- dependency> <groupId>org.slf4j</groupId> <artifactId>jcl-over-slf4j</artifactId> 
+			<version>1.4.2</version> </dependency -->
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.4.2</version>
+		</dependency>
+		<!--July 5th, 2010 - Release of SLF4J 1.6.1 Updated log4j dependency to 
+			version 1.2.16 and CAL10N dependency to version 0.7.4. <dependency> <groupId>ch.qos.cal10n</groupId> 
+			<artifactId>cal10n-api</artifactId> </dependency> -->
+		<!-- dependency> <groupId>org.slf4j</groupId> <artifactId>slf4j-api</artifactId> 
+			<version>1.4.2</version> </dependency -->
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jms</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+
+		<!--dependency> <groupId>org.apache.activemq</groupId> <artifactId>activemq-all</artifactId> 
+			<version>5.4.2</version> </dependency -->
+
+		<dependency>
+			<groupId>org.geoserver</groupId>
+			<artifactId>main</artifactId>
+			<version>${gs.version}</version>
+			<!-- exclusions> <exclusion> <groupId>org.slf4j</groupId> <artifactId>slf4j-api</artifactId> 
+				</exclusion> </exclusions -->
+			<!-- classifier>tests</classifier> <scope>test</scope -->
+		</dependency>
+
+
+		<dependency>
+			<groupId>org.restlet</groupId>
+			<artifactId>org.restlet</artifactId>
+			<version>1.0.8</version>
+		</dependency>
+
+		<!--dependency> <groupId>org.geoserver</groupId> <artifactId>wms</artifactId> 
+			<version>${gs.version}</version> </dependency -->
+
+		<!-- test dependencies -->
+
+		<dependency>
+			<groupId>xmlunit</groupId>
+			<artifactId>xmlunit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.mockrunner</groupId>
+			<artifactId>mockrunner</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
+
+</project>

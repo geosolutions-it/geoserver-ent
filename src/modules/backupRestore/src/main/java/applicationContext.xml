@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+
+<bean id="restConfigMapping" class="org.geoserver.rest.RESTMapping">
+	<property name="routes">
+	  <map>
+	       <entry>
+	         <key><value>/restore</value></key>
+	         <value>catalogRestore</value>
+	       </entry>
+	       <entry>
+	         <key><value>/backup</value></key>
+	         <value>catalogBackup</value>
+	       </entry>
+	  </map>
+	</property>
+</bean>
+
+<!--  <bean id="abstractCatalogFinder" class="org.geoserver.catalog.rest.AbstractCatalogFinder" abstract="true">-->
+<!--    <constructor-arg ref="catalog"/>-->
+<!--  </bean>-->
+  
+  <bean id="catalogRestore" class="org.geoserver.catalog.rest.CatalogRestore">
+     <constructor-arg index="0" ref="geoServer"/>
+  </bean>
+  
+  <bean id="backupRestoreEngine" class="org.geoserver.catalog.rest.BackupRestoreEngine">
+     <constructor-arg ref="geoServer"/>
+  </bean>
+  
+  <bean id="catalogBackup" class="org.geoserver.catalog.rest.CatalogBackup" depends-on="backupRestoreEngine">
+     <constructor-arg  index="0" ref="geoServer"/>
+     <constructor-arg  index="1" ref="backupRestoreEngine"/>
+     <constructor-arg index="2" type="int" value="10"/>
+  </bean>
+  
+  <bean id="catalogLocker" class="org.geoserver.rest.RestConfigurationLockCallback">
+    <constructor-arg index="0" ref="configurationLock"/>
+  </bean>
+</beans>
