@@ -20,6 +20,7 @@ import org.geoserver.config.GeoServer;
 import org.geoserver.config.GeoServerInfo;
 import org.geoserver.config.LoggingInfo;
 import org.geoserver.config.ServiceInfo;
+import org.geoserver.config.SettingsInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jms.core.JmsTemplate;
@@ -190,5 +191,37 @@ public class JMSConfigurationListener extends JMSListener implements Configurati
 		// this is potentially a problem since this listener should be the first
 		// called by the GeoServer.
 
+	}
+
+	@Override
+	public void handleSettingsAdded(SettingsInfo settings) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void handleSettingsModified(SettingsInfo settings,
+			List<String> propertyNames, List<Object> oldValues,
+			List<Object> newValues) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void handleSettingsPostModified(SettingsInfo settings) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void handleSettingsRemoved(SettingsInfo settings) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void handleServiceRemove(ServiceInfo service) {
+		// TODO Auto-generated method stub
+		
 	}
 }

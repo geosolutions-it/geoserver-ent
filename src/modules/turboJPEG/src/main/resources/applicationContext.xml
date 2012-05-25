@@ -3,12 +3,10 @@
 
 <beans>
 
-  <bean id="OpenLayersMapOutputExclusionFilter" class="org.geoserver.platform.NameExclusionFilter">
-    	<property name="beanId" value="JPEGMapResponse" />
+  <bean id="TurboJPEGMapOutputExclusionFilter" class="org.geoserver.platform.NameExclusionFilter">
+    <property name="beanId" value="JPEGMapResponse" />
   </bean>
-
-   <bean id="TurboJPEGMapResponse" class="it.geosolutions.geoserver.TurboJPEGMapResponse">
-    <constructor-arg index="0" ref="wms" />
-  </bean>
-
+   <bean id="TurboJPEGMapResponse" class="it.geosolutions.geoserver.map.turbojpeg.TurboJPEGMapResponse">
+      <constructor-arg ref="wms" />
+    </bean>
 </beans>

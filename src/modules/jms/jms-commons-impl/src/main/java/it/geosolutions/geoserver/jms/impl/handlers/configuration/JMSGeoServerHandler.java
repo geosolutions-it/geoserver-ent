@@ -10,6 +10,8 @@ import it.geosolutions.geoserver.jms.impl.events.configuration.JMSGlobalModifyEv
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.ThreadPoolExecutor;
 
+import javax.media.jai.TileCache;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.BeanUtilsBean;
 import org.geoserver.config.ContactInfo;
@@ -20,7 +22,6 @@ import org.geoserver.config.JAIInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.media.jai.util.SunTileCache;
 import com.thoughtworks.xstream.XStream;
 
 /**
@@ -148,7 +149,7 @@ public class JMSGeoServerHandler extends
 		// get local instance
 		final JAIInfo info = geoServer.getGlobal().getJAI();
 		// temporarily store tyleCache reference
-		final SunTileCache sunTyleCache = info.getTileCache();
+		final TileCache sunTyleCache = info.getTileCache();
 		// overwrite all members
 		BeanUtils.copyProperties(info, deserInfo);
 		// set tyle cache using stored reference

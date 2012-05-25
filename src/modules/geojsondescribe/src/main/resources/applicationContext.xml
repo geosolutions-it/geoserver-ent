@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+	<bean id="geojsonpDescribeOutput" 
+		class="org.geoserver.wfs.json.GeoJsonDescribeOutputFormat">
+		<constructor-arg ref="geoServer"/>
+		<constructor-arg value="text/javascript"/>
+	</bean>
+	
+	<bean id="geojsonDescribeOutput" 
+		class="org.geoserver.wfs.json.GeoJsonDescribeOutputFormat">
+		<constructor-arg ref="geoServer"/>
+		<constructor-arg value="application/json"/>
+	</bean>	
+
+</beans>

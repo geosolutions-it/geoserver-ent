@@ -1,13 +1,24 @@
 <global>
-  <contact>
-    <addressCity>Alexandria</addressCity>
-    <addressCountry>Egypt</addressCountry>
-    <addressType>Work</addressType>
-    <contactEmail>claudius.ptolomaeus@gmail.com</contactEmail>
-    <contactOrganization>The ancient geographes INC</contactOrganization>
-    <contactPerson>Claudius Ptolomaeus</contactPerson>
-    <contactPosition>Chief geographer</contactPosition>
-  </contact>
+  <settings>
+    <contact>
+      <address>Via Poggio alle Viti, 1157</address>
+      <addressCity>Massarosa</addressCity>
+      <addressCountry>Italy</addressCountry>
+      <addressPostalCode>55054</addressPostalCode>
+      <addressState>LU</addressState>
+      <addressType>Work</addressType>
+      <contactEmail>andrea.aime@geo-solutions.it</contactEmail>
+      <contactOrganization>GeoSolutions S.A.S.</contactOrganization>
+      <contactPerson>Andrea Aime</contactPerson>
+      <contactPosition>Tech Lead</contactPosition>
+      <contactVoice>+39 339 8844549</contactVoice>
+    </contact>
+    <charset>UTF-8</charset>
+    <numDecimals>8</numDecimals>
+    <onlineResource>http://geoserver.org</onlineResource>
+    <verbose>false</verbose>
+    <verboseExceptions>false</verboseExceptions>
+  </settings>
   <jai>
     <allowInterpolation>false</allowInterpolation>
     <recycling>false</recycling>
@@ -27,12 +38,8 @@
     <queueType>UNBOUNDED</queueType>
     <imageIOCacheThreshold>10240</imageIOCacheThreshold>
   </coverageAccess>
-  <charset>UTF-8</charset>
-  <numDecimals>8</numDecimals>
-  <onlineResource>http://geoserver.org</onlineResource>
-  <verbose>false</verbose>
-  <verboseExceptions>false</verboseExceptions>
-  <updateSequence>74</updateSequence>
+  <updateSequence>158</updateSequence>
   <featureTypeCacheSize>0</featureTypeCacheSize>
   <globalServices>true</globalServices>
+  <xmlPostRequestLogBufferSize>1024</xmlPostRequestLogBufferSize>
 </global>

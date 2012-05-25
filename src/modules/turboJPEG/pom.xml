@@ -6,7 +6,7 @@
     <parent>
         <groupId>it.geosolutions.geoserver</groupId>
         <artifactId>geoserver-modules</artifactId>
-        <version>2.1-SNAPSHOT</version>
+        <version>2.2-SNAPSHOT</version>
     </parent>
 
     <groupId>it.geosolutions.geoserver</groupId>
@@ -16,16 +16,22 @@
     <name>GeoServer turboJPEG Module</name>
     
     <dependencies>
+        <!-- dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-main</artifactId>
+            <version>${gt.version}</version>
+            <scope>test</scope>
+        </dependency-->    
         <dependency>
             <groupId>org.geotools</groupId>
-            <artifactId>gt-coverage</artifactId>
+            <artifactId>gt-sample-data</artifactId>
             <version>${gt.version}</version>
-        </dependency>
-        
+            <scope>test</scope>
+        </dependency>        
         <dependency>
         	<groupId>it.geosolutions.imageio-ext</groupId>
 			<artifactId>imageio-ext-turbojpeg</artifactId>
-			<version>1.0.9-SNAPSHOT</version>
+			<version>${imageio-ext.version}</version>
 	    </dependency>
 	
         <!-- test dependencies -->

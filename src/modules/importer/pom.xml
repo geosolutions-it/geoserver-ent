@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+  http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>it.geosolutions.geoserver</groupId>
+		<artifactId>geoserver-modules</artifactId>
+		<version>2.2-SNAPSHOT</version>
+	</parent>
+
+	<groupId>it.geosolutions.geoserver</groupId>
+	<artifactId>importer</artifactId>
+	<packaging>pom</packaging>
+	<name>GeoServer Data Importer</name>
+
+
+	<modules>
+		<module>core</module>
+		<module>web</module>
+	</modules>
+
+	<profiles>
+		<profile>
+			<!-- This profile activates Oracle support for good, useful to make a 
+				.war with store and driver -->
+			<id>oracle</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.geotools.jdbc</groupId>
+					<artifactId>gt-jdbc-oracle</artifactId>
+					<version>${gt.version}</version>
+				</dependency>
+				<dependency>
+					<groupId>com.oracle</groupId>
+					<artifactId>ojdbc14</artifactId>
+					<version>10.2.0.3.0</version>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<!-- This profile activates SQL server support for good, useful to make 
+				a .war with store and driver -->
+			<id>sqlserver</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.geotools.jdbc</groupId>
+					<artifactId>gt-jdbc-sqlserver</artifactId>
+					<version>${gt.version}</version>
+				</dependency>
+				<dependency>
+					<groupId>com.microsoft</groupId>
+					<artifactId>sqljdbc</artifactId>
+					<version>3.0</version>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
+
+</project>
