@@ -27,6 +27,7 @@ package it.geosolutions.geoserver.jms.test.rest;
 
 
 import it.geosolutions.geoserver.rest.decoder.RESTCoverageStore;
+import it.geosolutions.geoserver.rest.encoder.GSResourceEncoder.ProjectionPolicy;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -79,10 +80,11 @@ public class ConfigTest extends GeoserverRESTTest {
     @Test
 //  @Ignore
     public void insertStyles() throws FileNotFoundException, IOException {
-
+        if (!enabled()) return;
+        deleteAll();
+        
         File sldDir = new ClassPathResource("testdata").getFile();
         for(File sldFile : sldDir.listFiles((FilenameFilter)new SuffixFileFilter(".sld"))) {
-//            LOGGER.info("Existing styles: " + reader.getStyles().getNames());
             String basename = FilenameUtils.getBaseName(sldFile.toString());
             LOGGER.info("Publishing style " + sldFile + " as " + basename);
             assertTrue("Cound not publish " + sldFile, publisher.publishStyle(sldFile, basename));
@@ -92,9 +94,10 @@ public class ConfigTest extends GeoserverRESTTest {
     @Test
 //    @Ignore
     public void insertExternalGeotiff() throws FileNotFoundException, IOException {
-
+        if (!enabled()) return;
+        deleteAll();
+        
         String storeName = "testRESTStoreGeotiff";
-        String layerName = "resttestdem";
 
         File geotiff = new ClassPathResource("testdata/resttestdem.tif").getFile();
         RESTCoverageStore pc = publisher.publishExternalGeoTIFF(DEFAULT_WS, storeName, geotiff, null, null);
@@ -105,14 +108,13 @@ public class ConfigTest extends GeoserverRESTTest {
     @Test
 //  @Ignore
     public void insertShape() {
-
+        if (!enabled()) return;
+        deleteAll();
+        
         File zipFile;
 		try {
 			zipFile = new ClassPathResource("testdata/resttestshp.zip").getFile();
-		
-
-        RESTCoverageStore store= publisher.publishExternalGeoTIFF(DEFAULT_WS, "anyname", zipFile, "EPSG:4326", "default_point");
-        assertTrue("publish() failed", store!=null);
+			assertTrue("publish() failed", publisher.publishShp(DEFAULT_WS, "anyname", "anyname", zipFile, "EPSG:4326", "default_point"));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
