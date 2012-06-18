@@ -16,8 +16,6 @@
  */
 package it.geosolutions.geoserver.map.turbojpeg;
 
-import it.geosolutions.geoserver.map.turbojpeg.TurboJpegImageWorker;
-import it.geosolutions.imageio.plugins.turbojpeg.TurboJpegImageWriterSpi;
 import it.geosolutions.imageio.plugins.turbojpeg.TurboJpegUtilities;
 
 import java.io.File;
@@ -31,7 +29,7 @@ import junit.framework.Assert;
 
 import org.geotools.image.ImageWorker;
 import org.geotools.test.TestData;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -47,10 +45,8 @@ public class TurboImageWorkerTest extends Assert {
     
     static final Logger LOGGER = Logger.getLogger(TurboImageWorkerTest.class.toString());
 
-    static final TurboJpegImageWriterSpi turboSPI = new TurboJpegImageWriterSpi();
-
-    @Before
-    public void setup() {
+    @BeforeClass
+    public static void setup() {
         SKIP_TESTS = !TurboJpegUtilities.isTurboJpegAvailable();
     }
 
