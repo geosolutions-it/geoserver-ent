@@ -31,7 +31,39 @@
       <groupId>org.geoserver.extension</groupId>
       <artifactId>oracle</artifactId>
     </dependency>
-
+    <dependency>
+      <groupId>org.geoserver.extension</groupId>
+      <artifactId>jp2k</artifactId>
+    </dependency>    
+    <!--dependency>
+      <groupId>org.geoserver.extension</groupId>
+      <artifactId>gdal</artifactId>
+    </dependency-->
+    <!--dependency>
+      <groupId>org.geoserver.extension</groupId>
+      <artifactId>wps</artifactId>
+    </dependency-->
+    <dependency>
+      <groupId>org.geoserver.extension</groupId>
+      <artifactId>sqlserver</artifactId>
+    </dependency>   
+    <dependency>
+      <groupId>org.geoserver.extension</groupId>
+      <artifactId>charts</artifactId>
+    </dependency> 
+    <!--dependency>
+      <groupId>org.geoserver.extension</groupId>
+      <artifactId>pyramid</artifactId>
+    </dependency--> 
+    <dependency>
+      <groupId>org.geoserver.extension</groupId>
+      <artifactId>querylayer</artifactId>
+    </dependency> 
+    <!--dependency>
+      <groupId>org.geoserver.extension</groupId>
+      <artifactId>monitoring</artifactId>
+    </dependency-->                         
+    
    <!-- Jetty test dependencies to start GeoServer from an IDE -->
     <dependency>
       <groupId>org.mortbay.jetty</groupId>
@@ -56,7 +88,7 @@
       <plugin>
         <groupId>org.geoserver.maven</groupId>
         <artifactId>config</artifactId>
-<!--        <version>2.1-SNAPSHOT</version>-->
+        <version>${gs.version}</version>
         <executions>
           <execution>
             <id>configPackage</id>
@@ -127,7 +159,21 @@
       <version>${project.version}</version>
     </dependency>
     -->
+
+  <properties>
+    <configId>minimal</configId>
+    <configDirectory>${basedir}</configDirectory>
+    <webappSourceDirectory>${basedir}/src/main/webapp</webappSourceDirectory>
+    <sde.version>9.3</sde.version>
+  </properties>
   <profiles>
+    <profile>
+      <id>release</id>
+      <properties>
+        <configDirectory>${basedir}/../../data</configDirectory>
+        <configId>release</configId>
+      </properties>
+    </profile>
 <!-- ======================================= -->
 <!-- JMS Client -->
 <!-- ======================================= -->
@@ -172,11 +218,24 @@
 			</dependency>
 		</dependencies>
 	</profile>
+<!-- ======================================= -->
+<!-- Turbo JPEG -->
+<!-- ======================================= -->
+	<profile>
+		<id>turbojpeg</id>
+		<activation>
+			<property>
+				<name>all</name>
+				<value>true</value>
+			</property>
+		</activation>
+		<dependencies>
+			<dependency>
+				<groupId>it.geosolutions.geoserver</groupId>
+				<artifactId>turboJPEG</artifactId>
+			</dependency>
+		</dependencies>
+	</profile>
   </profiles>
-
-  <properties>
-    <configDirectory>${basedir}</configDirectory>
-    <configId>minimal</configId>
-  </properties>
 </project>
 
