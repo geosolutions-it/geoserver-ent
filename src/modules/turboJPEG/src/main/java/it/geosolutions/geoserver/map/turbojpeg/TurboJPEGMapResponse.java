@@ -55,6 +55,20 @@ public class TurboJPEGMapResponse extends RenderedImageMapResponse {
     public TurboJPEGMapResponse(WMS wms) {
         super(MIME_TYPE, wms);
         fallback = new JPEGMapResponse(wms);
+        if(!TURBO_JPEG_LIB_AVAILABLE){
+            if(LOGGER.isLoggable(Level.WARNING)){
+                LOGGER.warning("The turbo jpeg encoder is not available, check the native libs installation");
+            }
+        } else {
+            if(LOGGER.isLoggable(Level.WARNING)){
+                LOGGER.warning("The turbo jpeg encoder is available for usage");
+            } 
+        }        
+        if(DISABLE_TURBO){
+            if(LOGGER.isLoggable(Level.WARNING)){
+                LOGGER.warning("The turbo jpeg encoder has been explicitly disabled");
+            }
+        }        
     }
 
     @Override
