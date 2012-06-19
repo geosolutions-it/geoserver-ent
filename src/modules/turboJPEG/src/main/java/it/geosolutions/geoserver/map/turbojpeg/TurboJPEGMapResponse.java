@@ -18,12 +18,13 @@ import org.geoserver.wms.WMS;
 import org.geoserver.wms.WMSMapContext;
 import org.geoserver.wms.map.JPEGMapResponse;
 import org.geoserver.wms.map.RenderedImageMapResponse;
+
 /**
  * Specific {@link RenderedImageMapResponse} for JPEG using LibJPEGTurbo.
  * 
  * @author Simone Giannecchini, GeoSolutions SAS
  * @author Daniele Romagnoli, GeoSolutions SAS
- *
+ * 
  */
 public class TurboJPEGMapResponse extends RenderedImageMapResponse {
 
@@ -31,11 +32,15 @@ public class TurboJPEGMapResponse extends RenderedImageMapResponse {
     private final static Logger LOGGER = org.geotools.util.logging.Logging
             .getLogger(TurboJPEGMapResponse.class);
 
-    private JPEGMapResponse fallback;
+    private final JPEGMapResponse fallback;
 
-    private final static boolean DISABLE_TURBO= Boolean.getBoolean("disable.turbojpeg");
-    
-    private final static boolean TURBO_JPEG_LIB_AVAILABLE=TurboJpegUtilities.isTurboJpegAvailable();
+    private final static boolean DISABLE_TURBO = Boolean.getBoolean("disable.turbojpeg");
+
+    /** Let us check if we have to fallback on the standard {@link JPEGMapResponse} in case
+     * we do not have the right native libs for libjpeg turbo at hand.
+     */
+    private final static boolean TURBO_JPEG_LIB_AVAILABLE = TurboJpegUtilities
+            .isTurboJpegAvailable();
 
     /**
      * Default capabilities for JPEG .
@@ -51,7 +56,8 @@ public class TurboJPEGMapResponse extends RenderedImageMapResponse {
      * <p>
      * We should soon support multipage tiff.
      */
-    private final static MapProducerCapabilities CAPABILITIES = new MapProducerCapabilities(true, false,false, false, null);
+    private final static MapProducerCapabilities CAPABILITIES = new MapProducerCapabilities(true,
+            false, false, false, null);
 
     /** the only MIME type this map producer supports */
     private static final String MIME_TYPE = "image/jpeg";
@@ -71,26 +77,37 @@ public class TurboJPEGMapResponse extends RenderedImageMapResponse {
             WMSMapContext mapContext) throws ServiceException, IOException {
 
         // FALLBACK
-        if(!TURBO_JPEG_LIB_AVAILABLE||DISABLE_TURBO){
-                if(LOGGER.isLoggable(Level.INFO)){
-                        LOGGER.info("About to fallback on standard lib as libjpeg-turbi is not available");
-                }
-                fallback.formatImageOutputStream(image, outStream,mapContext );
-                return;
+        if (!TURBO_JPEG_LIB_AVAILABLE || DISABLE_TURBO) {
+            if (LOGGER.isLoggable(Level.INFO)) {
+                LOGGER.info("About to fallback on standard lib as libjpeg-turbi is not available");
+            }
+            fallback.formatImageOutputStream(image, outStream, mapContext);
+            return;
         }
-        
+
         if (LOGGER.isLoggable(Level.FINE)) {
-            LOGGER.fine("About to write a JPEG image using libjpeg-turbo");
+            LOGGER.fine("About to write a JPEG image using libjpeg-turbo with compression set at "+wms.getJpegCompression());
         }
         float quality = (100 - wms.getJpegCompression()) / 100.0f;
-        final TurboJpegImageWorker iw = new TurboJpegImageWorker(image);
-        iw.writeTurboJPEG(outStream, quality);
-
-        if (LOGGER.isLoggable(Level.FINE)) {
-            LOGGER.fine("Writing a JPEG done!!!");
+        TurboJpegImageWorker iw=null;
+        try{
+            iw = new TurboJpegImageWorker(image);
+            iw.writeTurboJPEG(outStream, quality);
+        } finally{
+            if(iw!=null){
+                try{
+                    iw.dispose();
+                } catch (Exception e) {
+                    if(LOGGER.isLoggable(Level.FINEST)){
+                        LOGGER.log(Level.FINEST,e.getLocalizedMessage(),e);
+                    }
+                }
+            }
         }
 
-        
+        if (LOGGER.isLoggable(Level.FINE)) {
+            LOGGER.fine("Writing a JPEG using libjpeg-turbo done!!!");
+        }
     }
 
 }
