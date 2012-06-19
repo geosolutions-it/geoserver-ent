@@ -37,8 +37,10 @@
     <properties>
         <gs.version>2.1-SNAPSHOT</gs.version><!-- same as project one -->
         <bkprst.version>2.2-SNAPSHOT</bkprst.version><!-- same as project one -->
+	<gt.version>2.7.5</gt.version>
         <jetty-version>6.1.8</jetty-version>
         <spring.version>2.5.5</spring.version>
+		<imageio-ext.version>1.1.2</imageio-ext.version>
     </properties>
 
     <dependencyManagement>
@@ -51,6 +53,14 @@
         	<type>pom</type>
         	<scope>import</scope>
         </dependency>
+			<!-- ======================================== -->
+			<!-- Turbo JPEG -->
+			<!-- ======================================== -->
+			<dependency>
+				<groupId>it.geosolutions.geoserver</groupId>
+				<artifactId>turboJPEG</artifactId>
+				<version>${project.version}</version>
+			</dependency>
 
 	<!-- ============================== -->
 	<!-- slf4j -->
@@ -171,6 +181,46 @@
 		<artifactId>oracle</artifactId>
 		<version>${gs.version}</version>
 	</dependency>	
+			<dependency>
+				<groupId>org.geoserver.extension</groupId>
+				<artifactId>jp2k</artifactId>
+				<version>${gs.version}</version>
+			</dependency>
+			<!--dependency>
+				<groupId>org.geoserver.extension</groupId>
+				<artifactId>gdal</artifactId>
+				<version>${gs.version}</version>
+			</dependency-->
+			<dependency>
+				<groupId>org.geoserver.extension</groupId>
+				<artifactId>wps</artifactId>
+				<version>${gs.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.geoserver.extension</groupId>
+				<artifactId>sqlserver</artifactId>
+				<version>${gs.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.geoserver.extension</groupId>
+				<artifactId>charts</artifactId>
+				<version>${gs.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.geoserver.extension</groupId>
+				<artifactId>pyramid</artifactId>
+				<version>${gs.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.geoserver.extension</groupId>
+				<artifactId>querylayer</artifactId>
+				<version>${gs.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.geoserver.extension</groupId>
+				<artifactId>monitoring</artifactId>
+				<version>${gs.version}</version>
+			</dependency>
 
 
 	<!-- ========================================-->
