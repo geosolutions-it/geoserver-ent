@@ -15,6 +15,13 @@
   <name>GeoServer Enterprise web application</name>
 
   <dependencies>
+  
+    <!-- log4j -->
+    <dependency>
+		<groupId>log4j</groupId>
+		<artifactId>log4j</artifactId>
+		<scope>runtime</scope>
+	</dependency>
     
     <!-- Base GeoServer dependency -->
     <dependency>
@@ -159,6 +166,7 @@
       <version>${project.version}</version>
     </dependency>
     -->
+    
 
   <properties>
     <configId>minimal</configId>
