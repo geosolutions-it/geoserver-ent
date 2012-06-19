@@ -33,7 +33,19 @@
 
     <name>GeoServer Enterprise JMS modules</name>
 
-<profiles>
+    <profiles>
+	<profile>
+		<id>activemq</id>
+		<activation>
+			<property>
+				<name>all</name>
+				<value>true</value>
+			</property>
+		</activation>
+		<modules>
+			<module>activemq_webapp</module>
+		</modules>
+	</profile>
 	<profile>
 		<id>jms-client</id>
 		<activation>
