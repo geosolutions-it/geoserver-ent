@@ -60,7 +60,6 @@
 <!--		</destinationPolicy>-->
 <!--	</broker>-->
 
-
 	<!-- SERVER -->
 
 	<!-- DESTINATION -->
@@ -75,6 +74,5 @@
 		<property name="defaultDestination" ref="virtualTopic" />
 		<property name="pubSubDomain" value="true" />
 	</bean>
-
 
 </beans>
