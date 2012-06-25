@@ -43,7 +43,7 @@
 			</property>
 		</activation>
 		<modules>
-			<module>activemq_webapp</module>
+			<module>activemqBroker</module>
 		</modules>
 	</profile>
 	<profile>
