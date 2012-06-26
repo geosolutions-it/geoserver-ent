@@ -33,7 +33,7 @@
 
 	<context:mbean-export default-domain="it.geosolutions.activemq"/>
 
-	<bean id="asyncStarter" class="it.geosolutions.activemq.AsyncStarter" depends-on="broker">
+	<bean id="asyncStarter" class="it.geosolutions.activemq.JMXAsyncStarter" depends-on="broker">
 		<constructor-arg ref="executorService"/>
 		<constructor-arg ref="broker"/>
 	</bean>

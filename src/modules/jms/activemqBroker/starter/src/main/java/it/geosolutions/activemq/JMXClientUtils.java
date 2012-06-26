@@ -43,16 +43,16 @@ import javax.management.remote.JMXServiceURL;
  * 
  * @author Carlo Cancellieri - carlo.cancellieri@geo-solutions.it
  */
-public class JMXClientUtils {
+public class JMXClientUtils<T> {
 
 	// JMX bean
 	public final static String SERVICE_JMXBEAN_KEY = "ServiceBean";
 	public final static String GB_JMXBEAN_NAME = "AsyncStarter";
 
 	// JMX
-	public final static String SERVICE_URL_KEY = "gb_jmx_url";
+	public final static String SERVICE_URL_KEY = "service_jmx_url";
 	public final static String SERVICE_URL = "localhost";
-	public final static String SERVICE_PORT_KEY = "gb_jmx_port";
+	public final static String SERVICE_PORT_KEY = "service_jmx_port";
 	public final static String SERVICE_PORT = "1099";
 
 
@@ -189,7 +189,7 @@ public class JMXClientUtils {
 	 *             if the name of the bean is not found into the environment
 	 *             (see {@link #SERVICE_JMXBEAN_KEY})
 	 */
-	public static AsyncServiceMonitor getProxy(Map<String, ?> environment,
+	public static AsyncStarter getProxy(Map<String, ?> environment,
 			JMXConnector jmxc) throws IOException,
 			MalformedObjectNameException, NullPointerException {
 
@@ -202,9 +202,9 @@ public class JMXClientUtils {
 				+ environment.get(SERVICE_JMXBEAN_KEY));
 
 		// create the proxy
-		final AsyncServiceMonitor mbeanProxy = JMX.newMBeanProxy(
+		final AsyncStarter mbeanProxy = JMX.newMBeanProxy(
 				jmxc.getMBeanServerConnection(), mbeanName,
-				AsyncServiceMonitor.class, true);
+				AsyncStarter.class, true);
 
 		return mbeanProxy;
 	}

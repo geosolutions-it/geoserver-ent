@@ -119,7 +119,7 @@ public class MainJMXClient {
     // the jmx connector
     private static JMXConnector jmxConnector = null;
     // the ActionManager's proxy
-    private static AsyncServiceMonitor serviceMonitor = null;
+    private static AsyncStarter serviceMonitor = null;
 
     /**
      * 
