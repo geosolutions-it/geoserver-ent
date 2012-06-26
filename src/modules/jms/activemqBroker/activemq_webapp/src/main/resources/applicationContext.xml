@@ -25,7 +25,7 @@
 		<property name="locations"> <value>file:${activemq.base}/conf/credentials.properties</value> 
 		</property> </bean -->
 
-	<amq:broker useJmx="false" persistent="false"
+	<amq:broker useJmx="true" persistent="false"
 		xmlns="http://activemq.apache.org/schema/core">
 
 		<destinationInterceptors>
@@ -36,23 +36,20 @@
 				</virtualDestinations>
 			</virtualDestinationInterceptor>
 		</destinationInterceptors>
-
 		<!--amq:transportConnectors> <amq:transportConnector uri="tcp://192.168.1.55:61616" 
 			/> </amq:transportConnectors -->
-
 
 	</amq:broker>
 
 	<broker id="broker" brokerName="router" persistent="true"
-		useJmx="false" xmlns="http://activemq.apache.org/schema/core" start="false">
+		useJmx="true" xmlns="http://activemq.apache.org/schema/core" start="false">
 
 		<!-- The managementContext is used to configure how ActiveMQ is exposed 
 			in JMX. By default, ActiveMQ uses the MBean server that is started by the 
 			JVM. For more information, see: http://activemq.apache.org/jmx.html -->
 		<managementContext>
-			<managementContext createConnector="false" />
+			<managementContext createConnector="true" />
 		</managementContext>
-
 
 
 		<!-- <networkConnectors xmlns="http://activemq.apache.org/schema/core"> 

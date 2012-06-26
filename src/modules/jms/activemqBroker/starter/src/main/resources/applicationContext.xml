@@ -16,7 +16,7 @@
 	xmlns:task="http://www.springframework.org/schema/task"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
   		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-contex
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
   		http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd">
 
 	<!-- Allows us to use system properties as variables in this configuration file -->
@@ -30,6 +30,8 @@
 <!-- 	</task:scheduled-tasks> -->
 <!-- 	<task:executor id="threadPoolTaskExecutor" pool-size="10" /> -->
 <!-- 	<task:annotation-driven executor="executorService" /> -->
+
+	<context:mbean-export default-domain="it.geosolutions.activemq"/>
 
 	<bean id="asyncStarter" class="it.geosolutions.activemq.AsyncStarter" depends-on="broker">
 		<constructor-arg ref="executorService"/>
