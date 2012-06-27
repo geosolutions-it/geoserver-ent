@@ -381,7 +381,14 @@
 				<enabled>false</enabled>
 			</releases>
 		</pluginRepository>
-
+		<pluginRepository>
+			<id>opengeo</id>
+			<name>OpenGeo Maven Repository</name>
+			<url>http://repo.opengeo.org/</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</pluginRepository>
 	</pluginRepositories>
 
 	<profiles>
