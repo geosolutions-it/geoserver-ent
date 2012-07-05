@@ -11,9 +11,12 @@ public class JMXAsyncStarter implements AsyncServiceMonitor, ServiceMonitor, Sla
     private transient final org.apache.activemq.xbean.XBeanBrokerService broker;
     private transient final ExecutorService executorService;
     
-    public JMXAsyncStarter(final ExecutorService executorService, final org.apache.activemq.xbean.XBeanBrokerService broker){
+    public JMXAsyncStarter(final ExecutorService executorService, final org.apache.activemq.xbean.XBeanBrokerService broker, final boolean asynStart) throws Exception{
         this.broker=broker;
-        this.executorService=executorService;   
+        this.executorService=executorService;
+        if (asynStart){
+        	this.asyncStart();
+        }
     }
     
     @Override

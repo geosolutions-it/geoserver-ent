@@ -20,27 +20,35 @@
   		http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd">
 
 	<!-- Allows us to use system properties as variables in this configuration file -->
-	<!--bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"> 
-		<property name="locations"> <value>file:${activemq.base}/conf/credentials.properties</value> 
-		</property> </bean -->
-
-<!-- context:component-scan base-package="it.geosolutions.activemq" /-->
-<!-- 	<task:scheduled-tasks> -->
-<!--	<task:scheduled ref="asyncStarter" method="asyncStart" cron="3/10 * * * * ?  />-->
-<!-- 	</task:scheduled-tasks> -->
-<!-- 	<task:executor id="threadPoolTaskExecutor" pool-size="10" /> -->
-<!-- 	<task:annotation-driven executor="executorService" /> -->
-
-	<context:mbean-export default-domain="it.geosolutions.activemq"/>
-
-	<bean id="asyncStarter" class="it.geosolutions.activemq.JMXAsyncStarter" depends-on="broker">
-		<constructor-arg ref="executorService"/>
-		<constructor-arg ref="broker"/>
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath*:activemq-async-jmx.properties</value>
+				<value>classpath*:internal-activemq-async-jmx.properties</value>
+			</list>
+		</property>
 	</bean>
 
-	<bean id="executorService" class="java.util.concurrent.Executors"
+	<!-- context:component-scan base-package="it.geosolutions.activemq" / -->
+	<!-- <task:scheduled-tasks> -->
+	<!-- <task:scheduled ref="asyncStarter" method="asyncStart" cron="3/10 * 
+		* * * ? /> -->
+	<!-- </task:scheduled-tasks> -->
+	<!-- <task:executor id="threadPoolTaskExecutor" pool-size="10" /> -->
+	<!-- <task:annotation-driven executor="executorService" /> -->
+
+	<context:mbean-export default-domain="it.geosolutions.activemq" />
+
+	<bean id="activemqAsyncStarter" class="it.geosolutions.activemq.JMXAsyncStarter"
+		depends-on="broker">
+		<constructor-arg ref="activemqExecutorService" />
+		<constructor-arg ref="broker" />
+		<constructor-arg value="${activemqAsyncStarter.asyncStart}"/>
+	</bean>
+
+	<bean id="activemqExecutorService" class="java.util.concurrent.Executors"
 		factory-method="newFixedThreadPool">
-		<constructor-arg value="10" />
+		<constructor-arg value="1" />
 	</bean>
 
 

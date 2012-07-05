@@ -21,9 +21,11 @@
 
 	<!-- Allows us to use system properties as variables in this configuration 
 		file -->
-	<!--bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"> 
-		<property name="locations"> <value>file:${activemq.base}/conf/credentials.properties</value> 
-		</property> </bean -->
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"> 
+		<property name="locations">
+			<value>activemq-jms.properties</value> 
+		</property>
+	</bean>
 
 	<amq:broker useJmx="true" persistent="false"
 		xmlns="http://activemq.apache.org/schema/core">
@@ -36,13 +38,11 @@
 				</virtualDestinations>
 			</virtualDestinationInterceptor>
 		</destinationInterceptors>
-		<!--amq:transportConnectors> <amq:transportConnector uri="tcp://192.168.1.55:61616" 
-			/> </amq:transportConnectors -->
 
 	</amq:broker>
 
 	<broker id="broker" brokerName="router" persistent="true"
-		useJmx="true" xmlns="http://activemq.apache.org/schema/core" start="false">
+		useJmx="${activemq.broker.useJmx}" xmlns="http://activemq.apache.org/schema/core" start="${activemq.broker.start}">
 
 		<!-- The managementContext is used to configure how ActiveMQ is exposed 
 			in JMX. By default, ActiveMQ uses the MBean server that is started by the 
@@ -74,13 +74,13 @@
 		<systemUsage>
 			<systemUsage>
 				<memoryUsage>
-					<memoryUsage limit="200 mb" />
+					<memoryUsage limit="${activemq.broker.systemUsage.memoryUsage}" />
 				</memoryUsage>
 				<storeUsage>
-					<storeUsage limit="1 gb" />
+					<storeUsage limit="${activemq.broker.systemUsage.storeUsage}" />
 				</storeUsage>
 				<tempUsage>
-					<tempUsage limit="200 mb" />
+					<tempUsage limit="${activemq.broker.systemUsage.tempUsage}" />
 				</tempUsage>
 			</systemUsage>
 		</systemUsage>
@@ -90,25 +90,13 @@
 			clients and other brokers. For more information, see: http://activemq.apache.org/configuring-transports.html -->
 		<transportConnectors>
 			<transportConnector name="openwire"
-				uri="tcp://localhost:61616?jms.useAsyncSend=true" />
+				uri="${activemq.broker.transportConnectors.uri}" />
 		</transportConnectors>
-
-		<!-- -->
-
-		<!-- <discoveryAgent> <zeroconfDiscovery type="_activemq.broker.development."/> 
-			</discoveryAgent> <discoveryNetworkConnector/> -->
 
 	</broker>
 
 	<!-- This xbean configuration file supports all the standard spring xml 
 		configuration options -->
-
-	<!-- Postgres DataSource Sample Setup > <bean id="postgres-ds" class="org.postgresql.ds.PGPoolingDataSource"> 
-		<property name="serverName" value="192.168.1.22"/> <property name="databaseName" 
-		value="activemq"/> <property name="portNumber" value="0"/> <property name="user" 
-		value="postgres"/> <property name="password" value="postgres"/> <property 
-		name="dataSourceName" value="postgres"/> <property name="initialConnections" 
-		value="1"/> <property name="maxConnections" value="10"/> </bean -->
 
 	<bean id="postgres-ds" class="org.postgresql.ds.PGPoolingDataSource">
 		<property name="serverName" value="localhost" />
@@ -134,8 +122,6 @@
 		<property name="url" value="jdbc:oracle:thin:@localhost:1521:AMQDB"/> <property 
 		name="username" value="scott"/> <property name="password" value="tiger"/> 
 		<property name="poolPreparedStatements" value="true"/> </bean> -->
-
-
 
 	<!-- Enable web consoles, REST and Ajax APIs and demos It also includes 
 		Camel (with its web console), see ${ACTIVEMQ_HOME}/conf/camel.xml for more 
