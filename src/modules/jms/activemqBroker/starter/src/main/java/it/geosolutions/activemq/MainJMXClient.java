@@ -58,7 +58,7 @@ public class MainJMXClient {
                 		"command connection.properties <COMMAND>\n" +
                 		"COMMAND:\n" +
                 		"     - isStarted" +
-                		"     - isStarted" +
+                		"     - isStopped" +
                 		"     - isSlave" +
                 		"     - asyncStart" +
                 		"     - asyncStop");
@@ -84,7 +84,7 @@ public class MainJMXClient {
             String command=argv[1];
             if (command==null || command.isEmpty())
                 System.exit(3);
-            boolean res=false;
+            boolean res=true;
             if (command.equalsIgnoreCase("asyncStart")){
                 serviceMonitor.asyncStart();
             } else if (command.equalsIgnoreCase("asyncStop")){
@@ -105,15 +105,14 @@ public class MainJMXClient {
                 System.exit(1);
             
         } catch (Exception e) {
-//            if (LOGGER.isDebugEnabled())
+            if (LOGGER.isDebugEnabled())
                 LOGGER.error(e.getLocalizedMessage(), e);
-//            else
-//                LOGGER.error(e.getLocalizedMessage());
-            System.exit(2);
+            else
+                LOGGER.error(e.getLocalizedMessage());
         } finally {
             dispose();
         }
-        
+        System.exit(2);
     }
 
     // the jmx connector

@@ -7,4 +7,10 @@ Run activemq tomcat instance adding the following options:
 For example from the directory:
 ${CATALINA_BASE}/webapps/activemq/WEB-INF/
 Run:
+java -Dfile.encoding=UTF-8 -classpath "lib/*" it.geosolutions.activemq.MainJMXClient classes/jmx.properties asyncStart
+
 java -Dfile.encoding=UTF-8 -classpath "lib/*" it.geosolutions.activemq.MainJMXClient classes/jmx.properties isSlave
+
+java -Dfile.encoding=UTF-8 -classpath "lib/*" it.geosolutions.activemq.MainJMXClient classes/jmx.properties isStarted
+
+java -Dfile.encoding=UTF-8 -classpath "lib/*" it.geosolutions.activemq.MainJMXClient classes/jmx.properties asyncStop

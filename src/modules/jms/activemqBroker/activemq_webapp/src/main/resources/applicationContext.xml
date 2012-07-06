@@ -23,7 +23,7 @@
 		file -->
 	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"> 
 		<property name="locations">
-			<value>activemq-jms.properties</value> 
+			<value>classpath*:activemq-jms.properties</value> 
 		</property>
 	</bean>
 
@@ -42,7 +42,7 @@
 	</amq:broker>
 
 	<broker id="broker" brokerName="router" persistent="true"
-		useJmx="${activemq.broker.useJmx}" xmlns="http://activemq.apache.org/schema/core" start="${activemq.broker.start}">
+		useJmx="${activemq.broker.useJmx}" xmlns="http://activemq.apache.org/schema/core" start="false">
 
 		<!-- The managementContext is used to configure how ActiveMQ is exposed 
 			in JMX. By default, ActiveMQ uses the MBean server that is started by the 
