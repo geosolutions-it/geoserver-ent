@@ -35,6 +35,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.junit.Test;
 import org.springframework.core.io.ClassPathResource;
 
 /**
@@ -49,10 +50,11 @@ public class GeoserverRESTPublisherTest extends GeoserverRESTTest {
 
     private final static Logger LOGGER = Logger.getLogger(GeoserverRESTPublisherTest.class);
 
-    public GeoserverRESTPublisherTest(String testName) {
-        super(testName);
+    public GeoserverRESTPublisherTest() {
+        super("GeoserverRESTPublisherTest");
     }
 
+    @Test
     public void testWorkspaces() {
         if (!enabled())
             return;
@@ -76,6 +78,7 @@ public class GeoserverRESTPublisherTest extends GeoserverRESTTest {
 
     final static String styleName = "restteststyle";
 
+    @Test
     public void testExternalGeotiff() throws FileNotFoundException, IOException {
         if (!enabled())
             return;
@@ -131,6 +134,7 @@ public class GeoserverRESTPublisherTest extends GeoserverRESTTest {
 
     }
 
+    @Test
     public void testCreateDeleteImageMosaicDatastore() {
         if (!enabled()) {
             return;

@@ -9,7 +9,7 @@ import javax.jms.Session;
 import org.springframework.jms.core.MessageCreator;
 import org.springframework.jms.core.JmsTemplate;
 
-public class JMSCatalogListenerTest {
+public abstract class JMSCatalogListenerTest {
 //    private JmsTemplate jmsTemplate;
 //    private Queue queue;
 //
