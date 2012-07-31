@@ -41,12 +41,15 @@ import org.geoserver.wms.MapLayerInfo;
 import org.geoserver.wms.MapProducerCapabilities;
 import org.geoserver.wms.WMS;
 import org.geoserver.wms.WMSMapContent;
+import org.geoserver.wms.map.OpenLayersMapOutputFormat;
 import org.geoserver.wms.map.RawMap;
 import org.geoserver.wms.map.RawMapResponse;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.Layer;
 import org.geotools.map.WMSLayer;
+import org.geotools.referencing.CRS;
+import org.geotools.referencing.CRS.AxisOrder;
 import org.geotools.temporal.object.DefaultPeriodDuration;
 import org.geotools.util.logging.Logging;
 import org.opengis.feature.type.FeatureType;
@@ -100,13 +103,19 @@ public class CustomOpenLayersMapOutputFormat implements GetMapOutputFormat {
     /**
      * static freemaker configuration
      */
+    private static Configuration cfgnd;
     private static Configuration cfg;
+    
 
     static {
-        cfg = new Configuration();
-        cfg.setClassForTemplateLoading(CustomOpenLayersMapOutputFormat.class, "");
+        cfgnd = new Configuration();
+        cfgnd.setClassForTemplateLoading(CustomOpenLayersMapOutputFormat.class, "");
         BeansWrapper bw = new BeansWrapper();
         bw.setExposureLevel(BeansWrapper.EXPOSE_PROPERTIES_ONLY);
+        cfgnd.setObjectWrapper(bw);
+        
+        cfg = new Configuration();
+        cfg.setClassForTemplateLoading(OpenLayersMapOutputFormat.class, "");
         cfg.setObjectWrapper(bw);
     }
 
@@ -144,6 +153,7 @@ public class CustomOpenLayersMapOutputFormat implements GetMapOutputFormat {
             map.put("pureCoverage", hasOnlyCoverages(mapContent));
             map.put("styles", styleNames(mapContent));
             map.put("request", mapContent.getRequest());
+            map.put("yx", String.valueOf(isWms13FlippedCRS(mapContent.getRequest().getCrs())));
             map.put("maxResolution", new Double(getMaxResolution(mapContent.getRenderingArea())));
 
             String baseUrl = mapContent.getRequest().getBaseUrl();
@@ -177,7 +187,7 @@ public class CustomOpenLayersMapOutputFormat implements GetMapOutputFormat {
             if (times == null || times.isEmpty()) {
                 template = cfg.getTemplate("OpenLayersMapTemplate.ftl");
             } else {
-                template = cfg.getTemplate("CustomOpenLayersMapTemplate.ftl");
+                template = cfgnd.getTemplate("CustomOpenLayersMapTemplate.ftl");
 
                 SimpleDateFormat df = new SimpleDateFormat(UTC_PATTERN);
                 df.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -239,6 +249,18 @@ public class CustomOpenLayersMapOutputFormat implements GetMapOutputFormat {
                 return false;
         }
         return true;
+    }
+    
+    private boolean isWms13FlippedCRS(CoordinateReferenceSystem crs) {
+        try {
+            String code = "EPSG:" + CRS.lookupIdentifier(crs, false);
+            code = WMS.toInternalSRS(code, WMS.version("1.3.0"));
+            CoordinateReferenceSystem crs13 = CRS.decode(code);
+            return CRS.getAxisOrder(crs13) == AxisOrder.NORTH_EAST;
+        } catch(Exception e) {
+            LOGGER.log(Level.WARNING, "Failed to determine CRS axis order, assuming is EN", e);
+            return false;
+        }
     }
 
     @SuppressWarnings("unchecked")
