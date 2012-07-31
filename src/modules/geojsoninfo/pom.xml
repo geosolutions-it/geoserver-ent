@@ -20,12 +20,6 @@
 			<groupId>org.geoserver</groupId>
 			<artifactId>wms</artifactId>
 			<version>${gs.version}</version>
-			<exclusions>
-        <exclusion>
-          <groupId>xerces</groupId>
-          <artifactId>xercesImpl</artifactId>
-        </exclusion>
-			</exclusions>
 		</dependency>
 
 
