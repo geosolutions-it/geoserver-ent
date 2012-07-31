@@ -42,11 +42,16 @@ public class TransactionTest extends GeoServerTestSupport {
         super.populateDataDirectory(dataDirectory);
         dataDirectory.addWellKnownCoverageTypes();
         File mockDir= dataDirectory.getDataDirectoryRoot();
-        String srcDir= mockDir.getAbsolutePath() + "/../../src/test/data";
         
-        FileUtils.copyDirectoryToDirectory(new File(srcDir + "/logs"), mockDir);
-        FileUtils.copyDirectoryToDirectory(new File(srcDir + "/gwc"), mockDir);
-        FileUtils.copyDirectoryToDirectory(new File(srcDir + "/data"), mockDir);
+        File logs = new File(mockDir + "/logs");
+        logs.mkdirs();
+        new File(logs, "log.txt").createNewFile();
+        File gwc = new File(mockDir + "/gwc");
+        gwc.mkdirs();
+        new File(gwc, "gwc.txt").createNewFile();
+        File data = new File(mockDir + "/data");
+        data.mkdirs();
+        new File(data, "data.txt").createNewFile();
     }
 
     protected int getNumFiles(File dir) {

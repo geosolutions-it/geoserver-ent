@@ -40,12 +40,16 @@ public class BackupRestoreTest extends GeoServerTestSupport {
         super.populateDataDirectory(dataDirectory);
         dataDirectory.addWellKnownCoverageTypes();
         File mockDir= dataDirectory.getDataDirectoryRoot();
-        String srcDir= mockDir.getAbsolutePath() + "/../../src/test/data";
         
-        FileUtils.copyDirectoryToDirectory(new File(srcDir + "/logs"), mockDir);
-        FileUtils.copyDirectoryToDirectory(new File(srcDir + "/gwc"), mockDir);
-        FileUtils.copyDirectoryToDirectory(new File(srcDir + "/data"), mockDir);
-        
+        File logs = new File(mockDir + "/logs");
+        logs.mkdirs();
+        new File(logs, "log.txt").createNewFile();
+        File gwc = new File(mockDir + "/gwc");
+        gwc.mkdirs();
+        new File(gwc, "gwc.txt").createNewFile();
+        File data = new File(mockDir + "/data");
+        data.mkdirs();
+        new File(data, "data.txt").createNewFile();
     }
 
     public int getNumFiles(File dir) {
@@ -66,7 +70,8 @@ public class BackupRestoreTest extends GeoServerTestSupport {
                 && response.getOutputStreamContent().contains("<id>"));
 
         Thread.sleep(6000);
-        assertEquals(this.getNumFiles(this.dataRoot.root()) -6 +1, this.getNumFiles(new File(backupDir)));
+        // the three txt files should not be there, but we have a backup.txt file added
+        assertEquals(this.getNumFiles(this.dataRoot.root()) - 3 + 1, this.getNumFiles(new File(backupDir)));
         
         response = postAsServletResponse("/rest/bkprst/restore", 
                 "<task>" 
@@ -75,7 +80,7 @@ public class BackupRestoreTest extends GeoServerTestSupport {
         assertTrue(response.getStatusCode() == 201 && response.getErrorCode() == 200);
 
         Thread.sleep(6000);
-         assertEquals(this.getNumFiles(this.dataRoot.root()) -6, this.getNumFiles(new File(backupDir)));
+        assertEquals(this.getNumFiles(this.dataRoot.root()) - 3, this.getNumFiles(new File(backupDir)));
     }
     
     public void testBackupRestoreDataNoGwcNoLog() throws Exception {
@@ -92,7 +97,8 @@ public class BackupRestoreTest extends GeoServerTestSupport {
                 && response.getOutputStreamContent().contains("<id>"));
 
         Thread.sleep(6000);
-        assertEquals(this.getNumFiles(this.dataRoot.root()) -4 +1, this.getNumFiles(new File(backupDir)));
+        // there are at least 3 files we did not back up
+        assertEquals(this.getNumFiles(this.dataRoot.root()) - 2 + 1, this.getNumFiles(new File(backupDir)));
         
         response = postAsServletResponse("/rest/bkprst/restore", 
                 "<task>" 
@@ -101,7 +107,7 @@ public class BackupRestoreTest extends GeoServerTestSupport {
         assertTrue(response.getStatusCode() == 201 && response.getErrorCode() == 200);
 
         Thread.sleep(6000);
-        assertEquals(this.getNumFiles(this.dataRoot.root()) -4, this.getNumFiles(new File(backupDir)));
+        assertEquals(this.getNumFiles(this.dataRoot.root()) - 2, this.getNumFiles(new File(backupDir)));
     }
 
     public void testBackupRestoreDataGwcNoLog() throws Exception {
@@ -118,7 +124,7 @@ public class BackupRestoreTest extends GeoServerTestSupport {
                 && response.getOutputStreamContent().contains("<id>"));
 
         Thread.sleep(6000);
-        assertEquals(this.getNumFiles(this.dataRoot.root()) -2 +1, this.getNumFiles(new File(backupDir)));
+        assertEquals(this.getNumFiles(this.dataRoot.root()) - 1 + 1, this.getNumFiles(new File(backupDir)));
         
         response = postAsServletResponse("/rest/bkprst/restore", 
                 "<task>" 
@@ -127,7 +133,7 @@ public class BackupRestoreTest extends GeoServerTestSupport {
         assertTrue(response.getStatusCode() == 201 && response.getErrorCode() == 200);
 
         Thread.sleep(6000);
-        assertEquals(this.getNumFiles(this.dataRoot.root()) -2, this.getNumFiles(new File(backupDir)));
+        assertEquals(this.getNumFiles(this.dataRoot.root()) - 1, this.getNumFiles(new File(backupDir)));
     }
 
     public void testBackupRestoreDataGwcLog() throws Exception {
@@ -144,7 +150,7 @@ public class BackupRestoreTest extends GeoServerTestSupport {
                 && response.getOutputStreamContent().contains("<id>"));
 
         Thread.sleep(6000);
-        assertEquals(this.getNumFiles(this.dataRoot.root()) +1, this.getNumFiles(new File(backupDir)));
+        assertEquals(this.getNumFiles(this.dataRoot.root()) + 1, this.getNumFiles(new File(backupDir)));
         
         response = postAsServletResponse("/rest/bkprst/restore", 
                 "<task>" 
