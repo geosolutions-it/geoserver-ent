@@ -142,8 +142,8 @@ public class StyleGenerator
         style = catalog.getFactory().createStyle();
         style.setName(styleName);
         style.setFilename(styleName + ".sld");
-        catalog.add(style);
         catalog.getResourcePool().writeStyle(style, new ByteArrayInputStream(sld.getBytes()));
+        catalog.add(style);
 
         return style;
     }
