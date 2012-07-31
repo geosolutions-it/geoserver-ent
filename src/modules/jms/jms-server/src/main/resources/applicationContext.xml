@@ -20,6 +20,7 @@
 	<bean id="propertyConfigurer"
 		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="ignoreResourceNotFound" value="true" />
+		<property name="systemPropertiesMode" value="2"/> <!--  allow system properties to override the properties file contents -->
 		<property name="locations">
 			<list>
 				<value>classpath:jms.properties</value>
