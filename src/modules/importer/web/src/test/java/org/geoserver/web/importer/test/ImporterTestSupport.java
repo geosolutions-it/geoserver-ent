@@ -38,7 +38,7 @@ public class ImporterTestSupport extends GeoServerWicketTestSupport
      */
     protected enum WicketPath
     {
-        IMPORT_LINK("category:5:category.links:0:link"),
+        IMPORT_LINK("category:6:category.links:0:link"),
         IMPORT_SHAPEFILELINK("stores:0:storeLink"),
         IMPORT_POSTGISLINK("stores:1:storeLink"),
         IMPORT_GEOTIFFLINK("stores:2:storeLink"),

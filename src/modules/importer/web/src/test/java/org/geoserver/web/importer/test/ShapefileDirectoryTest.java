@@ -156,6 +156,7 @@ public class ShapefileDirectoryTest extends ImporterTestSupport
         // Go to the page for importing a directory containing shapefiles
         tester.clickLink(WicketPath.IMPORT_LINK.path);
         tester.clickLink(WicketPath.IMPORT_SHAPEFILELINK.path);
+        
 
         // Fills the form with a directory containing test data
         FormTester form = tester.newFormTester(WicketPath.IMPORT_FORM.path);
@@ -168,6 +169,8 @@ public class ShapefileDirectoryTest extends ImporterTestSupport
         this.assertNoException();
         tester.assertNoErrorMessage();
         assertPage(VectorChooserPage.class);
+        
+        print(tester.getLastRenderedPage(), true, true);
 
         tester.assertContains("PondsTest");
 
