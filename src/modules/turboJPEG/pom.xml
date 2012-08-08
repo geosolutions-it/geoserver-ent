@@ -26,7 +26,7 @@
 		<dependency>
 			<groupId>it.geosolutions.imageio-ext</groupId>
 			<artifactId>imageio-ext-turbojpeg</artifactId>
-			<version>${imageio-ext-turbojpeg.version}</version>
+			<version>${imageio-ext.version}</version>
 		</dependency>
 
 		<!-- test dependencies -->
