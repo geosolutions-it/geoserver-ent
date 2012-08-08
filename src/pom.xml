@@ -18,7 +18,6 @@
 
 	<properties>
 		<gs.version>2.1-SNAPSHOT</gs.version><!-- same as project one -->
-		<bkprst.version>2.2-SNAPSHOT</bkprst.version><!-- same as project one -->
 		<gt.version>2.7.5</gt.version>
 		<jetty-version>6.1.8</jetty-version>
 		<spring.version>2.5.5</spring.version>
