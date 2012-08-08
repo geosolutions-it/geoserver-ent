@@ -176,25 +176,7 @@
       </properties>
     </profile>
 
-  
-<!-- ======================================= -->
-<!-- WMS - ND -->
-<!-- ======================================= -->
-	<profile>
-		<id>wms-nd</id>
-		<activation>
-			<property>
-				<name>all</name>
-				<value>true</value>
-			</property>
-		</activation>
-		<dependencies>
-			<dependency>
-				<groupId>it.geosolutions.geoserver</groupId>
-				<artifactId>wms-nd</artifactId>
-			</dependency>
-		</dependencies>
-	</profile>
+ 
 <!-- ======================================= -->
 <!-- JMS Client -->
 <!-- ======================================= -->

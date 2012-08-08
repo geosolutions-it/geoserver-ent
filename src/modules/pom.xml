@@ -156,21 +156,6 @@
 			</build>
 		</profile>
 		<!-- ======================================== -->
-		<!-- WMS-ND -->
-		<!-- ======================================== -->
-		<profile>
-			<id>wms-nd</id>
-			<activation>
-				<property>
-					<name>all</name>
-					<value>true</value>
-				</property>
-			</activation>
-			<modules>
-				<module>wms-nd</module>
-			</modules>
-		</profile>
-		<!-- ======================================== -->
 		<!-- Turbo JPEG -->
 		<!-- ======================================== -->
 		<profile>
