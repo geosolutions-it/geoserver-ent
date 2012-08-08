@@ -236,9 +236,9 @@ public abstract class GeoserverRESTTest extends Assert {
         List<String> layers = masterReader.getLayers().getNames();
         for (String layerName : layers) {
             RESTLayer layer = masterReader.getLayer(layerName);
-            if(layer.getType() == RESTLayer.TYPE.VECTOR)
+            if(layer.getType() == RESTLayer.Type.VECTOR)
                 deleteFeatureType(layer);
-            else if(layer.getType() == RESTLayer.TYPE.RASTER)
+            else if(layer.getType() == RESTLayer.Type.RASTER)
                 deleteCoverage(layer);
             else
                 LOGGER.error("Unknown layer type " + layer.getType());
