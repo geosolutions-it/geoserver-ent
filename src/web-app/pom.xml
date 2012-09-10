@@ -199,10 +199,6 @@
 					<groupId>it.geosolutions.geoserver</groupId>
 					<artifactId>jms-server-impl</artifactId>
 				</dependency>
-				<dependency>
-					<groupId>it.geosolutions.geoserver</groupId>
-					<artifactId>jms-server</artifactId>
-				</dependency>
 			</dependencies>
 		</profile>
 		<!-- ======================================= -->

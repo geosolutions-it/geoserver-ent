@@ -72,11 +72,6 @@
 			</dependency>
 			<dependency>
 				<groupId>it.geosolutions.geoserver</groupId>
-				<artifactId>jms-server</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>it.geosolutions.geoserver</groupId>
 				<artifactId>jms-client</artifactId>
 				<version>${project.version}</version>
 			</dependency>

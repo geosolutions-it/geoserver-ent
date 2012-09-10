@@ -71,7 +71,6 @@
 		<modules>
 			<module>jms-commons</module>
 			<module>jms-commons-impl</module>
-			<module>jms-server</module>
 			<module>jms-server-impl</module>
 		</modules>
 	</profile>
