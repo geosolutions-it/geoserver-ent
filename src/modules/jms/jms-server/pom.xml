@@ -11,10 +11,10 @@
 	</parent>
 
 	<groupId>it.geosolutions.geoserver</groupId>
-	<artifactId>jms-server-impl</artifactId>
+	<artifactId>jms-server</artifactId>
 	<packaging>jar</packaging>
 	<version>${gs.version}</version>
-	<name>GeoServer JMS Server module Implementation</name>
+	<name>GeoServer JMS Server module </name>
 
 	<dependencies>
 		<dependency>

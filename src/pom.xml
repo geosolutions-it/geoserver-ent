@@ -49,7 +49,7 @@
 			<!-- ======================================== -->
 			<dependency>
 				<groupId>it.geosolutions.geoserver</groupId>
-				<artifactId>jms-server-impl</artifactId>
+				<artifactId>jms-server</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
