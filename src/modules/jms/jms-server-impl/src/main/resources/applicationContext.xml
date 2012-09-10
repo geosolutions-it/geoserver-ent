@@ -14,23 +14,16 @@
                            http://activemq.apache.org/schema/core/activemq-core.xsd">
 
 	<context:component-scan base-package="it.geosoutions.geoserver.jms" />
-
 	<context:annotation-config />
 
 	<!-- SERVER side impl -->
 
-	<bean id="JMSCatalogListener" class="it.geosolutions.geoserver.jms.impl.JMSCatalogListener"
-		depends-on="JMSTopicTemplate,catalog,JMSProperties" lazy-init="true">
-		<constructor-arg index="0" ref="JMSTopicTemplate" />
-		<constructor-arg index="1" ref="rawCatalog" />
-	    <constructor-arg index="2" ref="JMSProperties" />
-	</bean>
-	
-	<bean id="JMSConfigurationListener" class="it.geosolutions.geoserver.jms.impl.JMSConfigurationListener"
+		<bean id="Producer" class="it.geosolutions.geoserver.jms.impl.ClusteringProducer"
 		depends-on="JMSTopicTemplate,geoServer,JMSProperties" lazy-init="true">
-		<constructor-arg index="0" ref="JMSTopicTemplate" />
-		<constructor-arg index="1" ref="geoServer" />
-	    <constructor-arg index="2" ref="JMSProperties" />
+		<constructor-arg index="1" ref="JMSTopicTemplate" />
+		<constructor-arg index="3" ref="geoServer" />
+		<constructor-arg index="2" ref="rawCatalog" />
+	    <constructor-arg index="0" ref="JMSProperties" />
 	</bean>
 	
 </beans>

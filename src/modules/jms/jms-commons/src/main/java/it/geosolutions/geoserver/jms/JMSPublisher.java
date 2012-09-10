@@ -30,11 +30,6 @@ public class JMSPublisher {
 
 	final static Logger LOGGER = LoggerFactory
 			.getLogger(JMSPublisher.class);
-	
-	/**
-	 * the {@link MessageCreator} used to serialize messages 
-	 */
-	//private MessageCreator creator;
 
 	/**
 	 * Constructor

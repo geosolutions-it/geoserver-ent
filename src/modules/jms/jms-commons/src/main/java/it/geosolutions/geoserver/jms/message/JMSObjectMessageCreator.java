@@ -5,7 +5,6 @@ import it.geosolutions.geoserver.jms.JMSProperties;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.Set;
 
 import javax.jms.JMSException;
@@ -39,7 +38,7 @@ public class JMSObjectMessageCreator implements
 	
 	protected void updateProperties(Message message) throws JMSException{
 		// append the name of the server
-		message.setObjectProperty(properties.getKeyName(),properties.getName());
+		message.setObjectProperty(JMSProperties.SERVER_NAME_KEY,properties.getName());
 		
 		// set other properties
 		final Set<Entry<Object, Object>> set = properties.getProperties().entrySet();

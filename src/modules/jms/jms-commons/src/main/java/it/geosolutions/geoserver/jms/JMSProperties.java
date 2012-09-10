@@ -29,17 +29,7 @@ public class JMSProperties {
 	
 	private String name;
 	
-	private final static String SERVER_NAME_KEY = "SERVER";
-	
-	public final static String getKeyName() {
-		return SERVER_NAME_KEY;
-	}
-
-	public JMSProperties(String name) {
-		super();
-		properties=new Properties();
-		setName(name);
-	}
+	public final static String SERVER_NAME_KEY = "SERVER";
 	
 	@Override
 	public Object clone(){
@@ -61,13 +51,9 @@ public class JMSProperties {
 	}
 	
 
-	protected JMSProperties() {
-		super();
+	public JMSProperties() {
 		properties=new Properties();
 		setName(SERVER_NAME_KEY);
-		if (LOGGER.isWarnEnabled())
-			LOGGER.warn("Empty constructor called. Default name will be assigned "
-					+ "to this JMSProperties instance. You can override this value using setName() method.");
 	}
 
 	/**

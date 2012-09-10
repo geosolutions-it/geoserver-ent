@@ -58,7 +58,8 @@ public class JMSQueueListener implements SessionAwareMessageListener {
 	}
 
 	public JMSQueueListener() {
-		properties = new JMSProperties("SERVER_NAME");
+		properties = new JMSProperties();
+		properties.setName(JMSProperties.SERVER_NAME_KEY);
 	}
 
 	@Override
@@ -70,13 +71,13 @@ public class JMSQueueListener implements SessionAwareMessageListener {
 		}
 
 		// FILTERING INCOMING MESSAGE
-		if (!message.propertyExists(JMSProperties.getKeyName()))
+		if (!message.propertyExists(JMSProperties.SERVER_NAME_KEY))
 			throw new JMSException(
 					"Unable to handle incoming message, property \'"
-							+ JMSProperties.getKeyName() + "\' not set.");
+							+ JMSProperties.SERVER_NAME_KEY + "\' not set.");
 
 		// check if message comes from a master with the same name of this slave
-		if (message.getStringProperty(JMSProperties.getKeyName()).equals(
+		if (message.getStringProperty(JMSProperties.SERVER_NAME_KEY).equals(
 				properties.getName())) {
 			if (LOGGER.isDebugEnabled()) {
 				LOGGER.debug("Incoming message discarded: source is equal to destination");

@@ -17,7 +17,7 @@
 
 	<context:annotation-config />
 
-	<!-- COMMENT OUT TO USE EXTERNAL BROKER -->
+	<!-- COMMENTED OUT TO USE EXTERNAL BROKER -->
 	<!-- lets create an embedded ActiveMQ Broker -->
 	<!-- offlineDurableSubscriberTimeout="86400000" offlineDurableSubscriberTaskSchedule="3600000" -->
 <!--	<amq:broker useJmx="false" persistent="false">-->

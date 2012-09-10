@@ -29,21 +29,22 @@ import org.springframework.jms.core.JmsTemplate;
  * @see {@link ToggleEvent}
  * 
  * @author Carlo Cancellieri - carlo.cancellieri@geo-solutions.it
+ * @author Simone Giannecchini, GeoSolutions SAS
  * 
  */
-public class JMSListener implements ApplicationListener {
+public abstract class JMSListener implements ApplicationListener {
 
 	final static Logger LOGGER = LoggerFactory
-			.getLogger(JMSConfigurationListener.class);
+			.getLogger(JMSListener.class);
 
 	private final JMSProperties properties;
 	private final JmsTemplate jmsTemplate;
 
 	/**
-	 * this will be set to false: - until the GeoServer context is initialized -
+	 * This will be set to false: - until the GeoServer context is initialized -
 	 * if this instance of geoserver act as pure slave
 	 */
-	private volatile Boolean producerEnabled = false;
+	private Boolean producerEnabled = false;
 
 	public JMSListener(JMSProperties properties, JmsTemplate jmsTemplate) {
 		super();
@@ -75,8 +76,8 @@ public class JMSListener implements ApplicationListener {
 		// event coming from the GeoServer application when the configuration
 		// load process is complete
 		if (event instanceof ContextLoadedEvent) {
-			if (LOGGER.isInfoEnabled()) {
-				LOGGER.info("Activating JMS Catalog event publisher...");
+			if (LOGGER.isWarnEnabled()) {
+				LOGGER.warn("Activating JMS Catalog event publisher since the GeoServer context has been loaded. This GeoServer act as a master via the following class: "+this.getClass().getSimpleName());
 			}
 			setProducerEnabled(true);
 
@@ -127,6 +128,25 @@ public class JMSListener implements ApplicationListener {
 			}
 
 		}
+	}
+
+	public void reloaded() {
+	
+		// skip incoming events until context is loaded
+		if (!isProducerEnabled()) {
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("skipping incoming event: context is not initted");
+			}
+			return;
+		}
+	
+		// EAT EVENT
+		// TODO check why reloaded here? check differences from CatalogListener
+		// reloaded() method?
+		// TODO disable and re-enable the producer!!!!!
+		// this is potentially a problem since this listener should be the first
+		// called by the GeoServer.
+	
 	}
 
 }

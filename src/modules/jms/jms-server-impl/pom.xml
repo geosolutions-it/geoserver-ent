@@ -29,7 +29,6 @@
 			<groupId>it.geosolutions.geoserver</groupId>
 			<artifactId>jms-server</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>com.thoughtworks.xstream</groupId>
 			<artifactId>xstream</artifactId>
