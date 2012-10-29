@@ -1,0 +1,20 @@
+Potete seguire questa guida per implementare un processo senza dover
+modificare i sorgenti di GeoServer:
+
+http://docs.geoserver.org/stable/en/developer/programming-guide/wps-services/implementing.html
+
+Le interfacce GeoServerProcess e GSProcess sono solo dei marker,
+la factory che crea i processi e che li associa a un namespace li
+cerca nell'application
+context Spring mediante tale marker.
+
+Se volete farvi un namespace "csi" potete crearvi la vostra intefaccia marker,
+CSIProcess, e poi dichiarare nell'application context una factory che usi come
+prefisso "csi":
+
+    <bean id="csiProcessFactory"
+class="org.geoserver.wps.jts.SpringBeanProcessFactory">
+      <constructor-arg index="0" value="CSI custom processes"/>
+      <constructor-arg index="1" value="csi"/>
+      <constructor-arg index="2" value="it.csi.process.CSIProcess"/>
+    </bean>
