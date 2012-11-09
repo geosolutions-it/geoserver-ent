@@ -1,38 +1,20 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
     http://maven.apache.org/maven-v4_0_0.xsd ">
-   <modelVersion>4.0.0</modelVersion>
+	<modelVersion>4.0.0</modelVersion>
 
-   <groupId>org.geoserver</groupId>
-   <artifactId>WPS-IDASoundPropagationModel</artifactId>
-   <packaging>jar</packaging>
-   <version>2.3-SNAPSHOT</version>
-   <name>IDASoundPropagationModel</name>
-   
+	<groupId>org.geoserver</groupId>
+	<artifactId>WPS_CmdLine</artifactId>
+	<packaging>jar</packaging>
+	<version>2.3-SNAPSHOT</version>
+	<name>CmdLine</name>
+
 	<properties>
 		<gt.version>9-SNAPSHOT</gt.version>
 		<gs.version>2.3-SNAPSHOT</gs.version>
 	</properties>
 
 	<dependencies>
-
-		<dependency>
-			<groupId>org.geoserver</groupId>
-			<artifactId>WPS_WFSLog</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.geoserver</groupId>
-			<artifactId>WPS_ToFeature</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.geoserver</groupId>
-			<artifactId>WPS_CmdLine</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-process</artifactId>
@@ -75,12 +57,6 @@
 			<version>0.3.6</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- dependency>
-			<groupId>org.geoserver</groupId>
-			<artifactId>WPS_ToFeature</artifactId>
-			<version>${gs.version}</version>
-			<scope>test</scope>
-		</dependency -->
 		<dependency>
 			<groupId>org.geoserver</groupId>
 			<artifactId>main</artifactId>

@@ -11,7 +11,7 @@ import org.geotools.geometry.jts.JTS;
 import org.geotools.util.NullProgressListener;
 import org.opengis.feature.simple.SimpleFeature;
 
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 
 public class IDASoundPropagationModelProcessTest extends GeoServerTestSupport {
     /**
@@ -20,7 +20,7 @@ public class IDASoundPropagationModelProcessTest extends GeoServerTestSupport {
     public void testIDASoundPropagationModel() throws Exception {
     	IDASoundPropagationModelProcess idaSPMProcess = new IDASoundPropagationModelProcess(getGeoServer());
 		
-        Geometry footprint = JTS.toGeometry(new GeneralDirectPosition(12, 24));
+        Point footprint = JTS.toGeometry(new GeneralDirectPosition(6, 40));
         
 		SimpleFeatureCollection features = 
         	idaSPMProcess.execute(

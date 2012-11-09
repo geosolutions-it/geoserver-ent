@@ -1,16 +1,15 @@
 package org.geoserver.wps.gs;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 import org.geoserver.catalog.Catalog;
 import org.geoserver.catalog.WorkspaceInfo;
 import org.geoserver.config.GeoServer;
@@ -37,9 +36,9 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.util.ProgressListener;
 
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 
-@DescribeProcess(title = "helloWPS", description = "Hello WPS Sample")
+@DescribeProcess(title = "IDA Sound Propagation Model", description = "SPM Workflow. Gets SPM input params, logs to the DB and executes Matlab code.")
 public class IDASoundPropagationModelProcess implements GSProcess {
 
 	protected static final Logger LOGGER = Logging.getLogger(IDASoundPropagationModelProcess.class);
@@ -77,7 +76,7 @@ public class IDASoundPropagationModelProcess implements GSProcess {
 			@DescribeParameter(name = "season", description = "SPM attribute season") String season,
 			@DescribeParameter(name = "srcFrequency", description = "SPM attribute src_frequency") Double srcFrequency,
 			@DescribeParameter(name = "srcPressureLevel", description = "SPM attribute src_pressure_level") Double srcPressureLevel,
-			@DescribeParameter(name = "footprint", description = "SPM attribute footprint") Geometry footprint,
+			@DescribeParameter(name = "footprint", description = "SPM attribute footprint") Point footprint,
 			ProgressListener progressListener) throws ProcessException {
 
 		// first off, decide what is the target store
@@ -187,16 +186,27 @@ public class IDASoundPropagationModelProcess implements GSProcess {
 		
 		try
 		{
-			// in order to read a grid coverage we need to first store it on disk
-			File root = new File(System.getProperty("java.io.tmpdir", "."));
-			f = File.createTempFile("wps", "asc", root); // TODO: File back from OctaveProcess...
-			FileOutputStream os = null;
-			try {
-				os = new FileOutputStream(f);
-			} finally {
-				IOUtils.closeQuietly(os);
-			}
+			final File directory = catalog.getResourceLoader().findOrCreateDirectory("data", wsName, storeName);
+			//final File directory = new File("C:/data/NURC-IDA/output/");
+    		f = new File(directory, name + "_");
+    		
+			CmdLine cmdLineProcess = new CmdLine();
 
+			// --silent --eval \"rxlevel({_SPL},{_LAT},{_LON},{_FILEPATH});\" --path C:/Programmi/MMRM-TDA/matlabcode2/
+	        // --verbose --eval \"rxlevel(1,40,6,\\\"C:/data/NURC-IDA/output/test_\\\");\" --path C:/data/NURC-IDA/matlabcode2/
+	        
+			String results = cmdLineProcess.execute(
+	        		Arrays.asList(
+	        				"C:/Octave/3.2.4_gcc-4.4.0/bin/octave.exe", 
+	        				"--silent", "", 
+	        				"--eval", "\"rxlevel("+(srcPressureLevel==0||Double.isNaN(srcPressureLevel)?1:srcPressureLevel)+","+footprint.getY()+","+footprint.getX()+",\\\""+f.getAbsolutePath().replaceAll("\\\\", "/")+"\\\");\"", 
+	        				"--path", "C:/data/NURC-IDA/matlabcode2/"),
+	        		directory,
+	        		true,
+	        		null);
+
+			f = new File(directory, name + "_ASCIIgrid.asc");
+			
 	        // and then we try to read it as a asc
 	        coverage = new ArcGridFormat().getReader(f).read(null);
 		} 
@@ -221,7 +231,7 @@ public class IDASoundPropagationModelProcess implements GSProcess {
 				null,
 				coverage,
 				wsName,
-				spmRasterStoreName,
+				null,
 				spmRasterLayerName,
 				crs,
 				null,

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+	<bean id="cmdLine" class="org.geoserver.wps.gs.CmdLine" />
+
+	<!-- The PPIO that need to be registered into SPI because of their dependencies -->
+
+</beans>
