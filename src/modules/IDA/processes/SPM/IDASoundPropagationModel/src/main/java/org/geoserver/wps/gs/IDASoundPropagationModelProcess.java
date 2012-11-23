@@ -206,10 +206,10 @@ public class IDASoundPropagationModelProcess implements GSProcess {
 			String results = cmdLineProcess.execute(
 	        		Arrays.asList(
 	        				octaveExecutablePath, 
-	        				"--silent", //"",
-	        				//"--verbose", //"",
-	        				"--eval", "\"rxlevel("+(srcPressureLevel==0||Double.isNaN(srcPressureLevel)?1:srcPressureLevel)+","+footprint.getY()+","+footprint.getX()+",\\\""+f.getAbsolutePath().replaceAll("\\\\", "/")+"\\\");\"", 
-	        				"--path", octaveConfigFilePath),
+	        				//"--silent", //"",
+	        				"--eval", "rxlevel("+(srcPressureLevel==0||Double.isNaN(srcPressureLevel)?1:srcPressureLevel)+","+footprint.getY()+","+footprint.getX()+",\""+f.getAbsolutePath().replaceAll("\\\\", "/")+"\");", 
+	        				"--path", octaveConfigFilePath,
+	        				"--verbose"),
 	        		directory,
 	        		true,
 	        		new NullProgressListener());
