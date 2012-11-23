@@ -27,6 +27,7 @@ import org.geotools.process.factory.DescribeProcess;
 import org.geotools.process.factory.DescribeResult;
 import org.geotools.process.gs.GSProcess;
 import org.geotools.referencing.CRS;
+import org.geotools.util.NullProgressListener;
 import org.geotools.util.logging.Logging;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.Filter;
@@ -60,15 +61,16 @@ public class IDASoundPropagationModelProcess implements GSProcess {
 	
 	@DescribeResult(name = "result", description = "List of attributes to be converted to a FeatureType")
 	public SimpleFeatureCollection execute(
-			@DescribeParameter(name = "octaveConfigFilePath", description = "Octave Config file full path") String octaveConfigFilePath,
-			@DescribeParameter(name = "userId", description = "SPM attribute user_id") String userId,
-			@DescribeParameter(name = "name", description = "SPM attribute name") String name,
+			@DescribeParameter(name = "octaveExecutablePath", min = 1, description = "Octave Executable file full path") String octaveExecutablePath,
+			@DescribeParameter(name = "octaveConfigFilePath", min = 1, description = "Octave Config file full path") String octaveConfigFilePath,
+			@DescribeParameter(name = "userId", min = 1, description = "SPM attribute user_id") String userId,
+			@DescribeParameter(name = "name", min = 1, description = "SPM attribute name") String name,
 			@DescribeParameter(name = "outputUrl", description = "SPM attribute output_url") URL outputUrl,
 			@DescribeParameter(name = "runBegin", description = "SPM attribute run_begin") Date runBegin,
 			@DescribeParameter(name = "runEnd", description = "SPM attribute run_end") Date runEnd,
 			@DescribeParameter(name = "itemStatus", description = "SPM attribute item_status") String itemStatus,
 			@DescribeParameter(name = "itemStatusMessage", description = "SPM attribute item_status_message") String itemStatusMessage,
-			@DescribeParameter(name = "wsName", description = "SPM attribute workspace_name") String wsName,
+			@DescribeParameter(name = "wsName", min = 1, description = "SPM attribute workspace_name") String wsName,
 			@DescribeParameter(name = "storeName", description = "SPM attribute store_name") String storeName,
 			@DescribeParameter(name = "layerName", description = "SPM attribute layer_name") String layerName,
 			@DescribeParameter(name = "securityLevel", description = "SPM attribute security_level") String securityLevel,
@@ -129,7 +131,7 @@ public class IDASoundPropagationModelProcess implements GSProcess {
 		attributes.add(new FeatureAttribute("octaveConfigFilePath", octaveConfigFilePath));
 		attributes.add(new FeatureAttribute("userId", userId));
 		attributes.add(new FeatureAttribute("name", name));
-		attributes.add(new FeatureAttribute("outputUrl", outputUrl));
+		attributes.add(new FeatureAttribute("outputUrl", outputUrl.toExternalForm()));
 		attributes.add(new FeatureAttribute("runBegin", runBegin));
 		attributes.add(new FeatureAttribute("runEnd", runEnd));
 		attributes.add(new FeatureAttribute("itemStatus", (itemStatus != null ? itemStatus : "CREATED")));
@@ -159,10 +161,11 @@ public class IDASoundPropagationModelProcess implements GSProcess {
 		 * LOG into the DB
 		 */
         Filter filter = ff.equals(ff.property("ftUUID"), ff.literal(uuid.toString()));
-
+		//Filter filter = ff.equals(ff.property("name"), ff.literal(name));
+		
         WFSLog wfsLogProcess = new WFSLog(geoServer);
          
-        features = wfsLogProcess.execute(features, DEFAULT_TYPE_NAME, wsName, storeName, filter, null);
+        features = wfsLogProcess.execute(features, DEFAULT_TYPE_NAME, wsName, storeName, filter, true, new NullProgressListener());
         
         if (features == null || features.isEmpty())
 		{
@@ -190,29 +193,56 @@ public class IDASoundPropagationModelProcess implements GSProcess {
 			//final File directory = new File("C:/data/NURC-IDA/output/");
     		f = new File(directory, name + "_");
     		
-			CmdLine cmdLineProcess = new CmdLine();
+			CmdLine cmdLineProcess = new CmdLine(geoServer);
 
 			// --silent --eval \"rxlevel({_SPL},{_LAT},{_LON},{_FILEPATH});\" --path C:/Programmi/MMRM-TDA/matlabcode2/
 	        // --verbose --eval \"rxlevel(1,40,6,\\\"C:/data/NURC-IDA/output/test_\\\");\" --path C:/data/NURC-IDA/matlabcode2/
-	        
+			LOGGER.info("Executing Octave command with parameters: " + Arrays.asList(
+    				octaveExecutablePath, 
+    				"--silent", //"", 
+    				"--eval", "\"rxlevel("+(srcPressureLevel==0||Double.isNaN(srcPressureLevel)?1:srcPressureLevel)+","+footprint.getY()+","+footprint.getX()+",\\\""+f.getAbsolutePath().replaceAll("\\\\", "/")+"\\\");\"", 
+    				"--path", octaveConfigFilePath));
+
 			String results = cmdLineProcess.execute(
 	        		Arrays.asList(
-	        				"C:/Octave/3.2.4_gcc-4.4.0/bin/octave.exe", 
-	        				"--silent", "", 
+	        				octaveExecutablePath, 
+	        				"--silent", //"",
+	        				//"--verbose", //"",
 	        				"--eval", "\"rxlevel("+(srcPressureLevel==0||Double.isNaN(srcPressureLevel)?1:srcPressureLevel)+","+footprint.getY()+","+footprint.getX()+",\\\""+f.getAbsolutePath().replaceAll("\\\\", "/")+"\\\");\"", 
-	        				"--path", "C:/data/NURC-IDA/matlabcode2/"),
+	        				"--path", octaveConfigFilePath),
 	        		directory,
 	        		true,
-	        		null);
+	        		new NullProgressListener());
 
+			LOGGER.info("Command Line Process results : " + results);
+			
 			f = new File(directory, name + "_ASCIIgrid.asc");
+			
+			LOGGER.info("Trying to read ASC file: " + f.getAbsolutePath());
 			
 	        // and then we try to read it as a asc
 	        coverage = new ArcGridFormat().getReader(f).read(null);
 		} 
 		catch (Exception e)
 		{
-			if (progressListener != null)
+        	/**
+    		 * Update Feature Attributes and LOG into the DB
+    		 */
+            filter = ff.equals(ff.property("ftUUID"), ff.literal(uuid.toString()));
+
+            SimpleFeature feature = SimpleFeatureBuilder.copy(features.subCollection(filter).toArray(new SimpleFeature[1])[0]);
+            
+            // build the feature
+            feature.setAttribute("runEnd", new Date());
+            feature.setAttribute("itemStatus", "FAILED");
+            feature.setAttribute("itemStatusMessage", "There was an error while while processing Input parameters: "+e.getMessage());
+            
+            ListFeatureCollection output = new ListFeatureCollection(features.getSchema());
+            output.add(feature);
+    		
+    		features = wfsLogProcess.execute(output, DEFAULT_TYPE_NAME, wsName, storeName, filter, false, new NullProgressListener());
+
+    		if (progressListener != null)
     		{
     			progressListener.exceptionOccurred(e);
     		}
@@ -221,7 +251,7 @@ public class IDASoundPropagationModelProcess implements GSProcess {
 
 		final String spmRasterStoreName = FilenameUtils.getBaseName(f.getAbsolutePath());
 		final String spmRasterLayerName = FilenameUtils.getBaseName(f.getAbsolutePath());
-		final String styleName = null;
+		final String styleName = "spm";
 
 		/**
 		 * Import output Octave ASC layer into GeoServer
@@ -239,6 +269,23 @@ public class IDASoundPropagationModelProcess implements GSProcess {
 		
 		if (result == null || !result.contains(spmRasterLayerName))
 		{
+        	/**
+    		 * Update Feature Attributes and LOG into the DB
+    		 */
+            filter = ff.equals(ff.property("ftUUID"), ff.literal(uuid.toString()));
+
+            SimpleFeature feature = SimpleFeatureBuilder.copy(features.subCollection(filter).toArray(new SimpleFeature[1])[0]);
+            
+            // build the feature
+            feature.setAttribute("runEnd", new Date());
+            feature.setAttribute("itemStatus", "FAILED");
+            feature.setAttribute("itemStatusMessage", "There was an error while importing ASC layer into GeoServer.");
+            
+            ListFeatureCollection output = new ListFeatureCollection(features.getSchema());
+            output.add(feature);
+    		
+    		features = wfsLogProcess.execute(output, DEFAULT_TYPE_NAME, wsName, storeName, filter, false, new NullProgressListener());
+
     		if (progressListener != null)
     		{
     			progressListener.exceptionOccurred(new Exception("There was an error while importing ASC layer into GeoServer."));
@@ -251,27 +298,25 @@ public class IDASoundPropagationModelProcess implements GSProcess {
 			progressListener.progress(90);
 		}
 		
-		/**
-		 * Update Feature Attributes and LOG into the DB
-		 */
-        filter = ff.equals(ff.property("ftUUID"), ff.literal(uuid.toString()));
-
-        SimpleFeature feature = SimpleFeatureBuilder.copy(features.subCollection(filter).toArray(new SimpleFeature[1])[0]);
-        
-        // build the feature
-        feature.setAttribute("storeName", spmRasterStoreName);
-        feature.setAttribute("layerName", spmRasterLayerName);
-        feature.setAttribute("runEnd", new Date());
-        
-        wfsLogProcess = new WFSLog(geoServer);
-        
-        ListFeatureCollection output = new ListFeatureCollection(features.getSchema());
-        output.add(feature);
-		
-		features = wfsLogProcess.execute(output, DEFAULT_TYPE_NAME, wsName, storeName, filter, null);
-        
         if (features == null || features.isEmpty())
 		{
+        	/**
+    		 * Update Feature Attributes and LOG into the DB
+    		 */
+            filter = ff.equals(ff.property("ftUUID"), ff.literal(uuid.toString()));
+
+            SimpleFeature feature = SimpleFeatureBuilder.copy(features.subCollection(filter).toArray(new SimpleFeature[1])[0]);
+            
+            // build the feature
+            feature.setAttribute("runEnd", new Date());
+            feature.setAttribute("itemStatus", "FAILED");
+            feature.setAttribute("itemStatusMessage", "There was an error while logging FeatureType into the storage.");
+            
+            ListFeatureCollection output = new ListFeatureCollection(features.getSchema());
+            output.add(feature);
+    		
+    		features = wfsLogProcess.execute(output, DEFAULT_TYPE_NAME, wsName, storeName, filter, false, new NullProgressListener());
+    		
     		if (progressListener != null)
     		{
     			progressListener.exceptionOccurred(new Exception("There was an error while logging FeatureType into the storage."));
@@ -281,6 +326,24 @@ public class IDASoundPropagationModelProcess implements GSProcess {
         
 		if (progressListener != null)
 		{
+			/**
+			 * Update Feature Attributes and LOG into the DB
+			 */
+	        filter = ff.equals(ff.property("ftUUID"), ff.literal(uuid.toString()));
+
+	        SimpleFeature feature = SimpleFeatureBuilder.copy(features.subCollection(filter).toArray(new SimpleFeature[1])[0]);
+	        
+	        // build the feature
+	        feature.setAttribute("storeName", spmRasterStoreName);
+	        feature.setAttribute("layerName", spmRasterLayerName);
+	        feature.setAttribute("runEnd", new Date());
+	        feature.setAttribute("itemStatus", "COMPLETED");
+	        
+	        ListFeatureCollection output = new ListFeatureCollection(features.getSchema());
+	        output.add(feature);
+			
+			features = wfsLogProcess.execute(output, DEFAULT_TYPE_NAME, wsName, storeName, filter, false, new NullProgressListener());
+			
 			progressListener.progress(100);
 			progressListener.complete();
 		}

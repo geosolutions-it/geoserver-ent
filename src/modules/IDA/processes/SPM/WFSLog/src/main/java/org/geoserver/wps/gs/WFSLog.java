@@ -27,9 +27,11 @@ import org.geotools.data.Transaction;
 import org.geotools.data.collection.ListFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureIterator;
+import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotools.jdbc.JDBCFeatureStore;
 import org.geotools.process.ProcessException;
 import org.geotools.process.factory.DescribeParameter;
 import org.geotools.process.factory.DescribeProcess;
@@ -71,6 +73,7 @@ public class WFSLog implements GSProcess {
 			@DescribeParameter(name = "workspace", description = "The workSpace (must exist in the catalog)", min = 1) String workspace,
 			@DescribeParameter(name = "store", description = "The dataStore (must exist in the catalog)", min = 1) String store,
 			@DescribeParameter(name = "filter", description = "The update filter", min = 0) Filter filter,
+			@DescribeParameter(name = "filter", description = "Force insert row", min = 0) Boolean forceInsert,
 			ProgressListener progressListener) throws ProcessException {
 
 		catalog = geoServer.getCatalog();
@@ -203,7 +206,7 @@ public class WFSLog implements GSProcess {
 			
 			// update the data into the target store
 			try {
-				targetFeatures = updateDataStore(features, typeName, storeInfo, filter);
+				targetFeatures = updateDataStore(features, typeName, storeInfo, filter, forceInsert);
 			} catch (IOException e) {
 				throw new ProcessException(
 						"Failed to import data into the target store", e);
@@ -214,7 +217,7 @@ public class WFSLog implements GSProcess {
 	}
 
 	private SimpleFeatureCollection updateDataStore(SimpleFeatureCollection features,
-			String name, DataStoreInfo storeInfo, Filter filter) throws IOException,
+			String name, DataStoreInfo storeInfo, Filter filter, boolean forceInsert) throws IOException,
 			ProcessException {
 		SimpleFeatureCollection result = null;
 		SimpleFeatureType targetType;
@@ -257,20 +260,70 @@ public class WFSLog implements GSProcess {
 				.getFeatureSource(targetType.getTypeName());
 		fstore.setTransaction(t);
 		SimpleFeatureIterator fi = features.subCollection(filter).features();
-		String[] names = new String[mapping.entrySet().size()];
-        Object[] values = new Object[mapping.entrySet().size()];
-		while (fi.hasNext()) {
-			SimpleFeature source = fi.next();
-			int j=0;
-			for (String sname : mapping.keySet()) {
-				names[j]=mapping.get(sname);
-				values[j]=source.getAttribute(sname);
-				j++;
+		
+		LOGGER.info(" - WFS Logger : Filtered features# " + fi.hasNext());
+		
+		if (!forceInsert)
+		{
+			String[] names = new String[mapping.entrySet().size()];
+	        Object[] values = new Object[mapping.entrySet().size()];
+			while (fi.hasNext()) {
+				SimpleFeature source = fi.next();
+				int j=0;
+				for (String sname : mapping.keySet()) {
+					names[j]=mapping.get(sname);
+					values[j]=source.getAttribute(sname);
+					j++;
+				}
+				fstore.modifyFeatures(names, values, filter);
+				
+				result = new ListFeatureCollection(targetType);
+				((ListFeatureCollection)result).add(source);
 			}
-			fstore.modifyFeatures(names, values, filter);
+		}
+		else
+		{
+			SimpleFeatureSource fSource = ds.getFeatureSource(targetType.getTypeName());
 			
-			result = new ListFeatureCollection(targetType);
-			result.add(source);
+			if (fSource instanceof SimpleFeatureStore)
+			{
+				SimpleFeatureStore simpleFstore = (SimpleFeatureStore) fSource;
+				simpleFstore.setTransaction(t);
+				fi = features.features();
+				SimpleFeatureBuilder fb = new SimpleFeatureBuilder(targetType);
+				while (fi.hasNext()) {
+					SimpleFeature source = fi.next();
+					fb.reset();
+					for (String sname : mapping.keySet()) {
+						fb.set(mapping.get(sname), source.getAttribute(sname));
+					}
+					SimpleFeature target = fb.buildFeature(null);
+					simpleFstore.addFeatures(DataUtilities.collection(target));
+
+					result = new ListFeatureCollection(targetType);
+					((ListFeatureCollection)result).add(source);
+				}
+			}
+
+			else if (fSource instanceof JDBCFeatureStore)
+			{
+				JDBCFeatureStore jdbcFstore = (JDBCFeatureStore) fSource;
+				jdbcFstore.setTransaction(t);
+				fi = features.features();
+				SimpleFeatureBuilder fb = new SimpleFeatureBuilder(targetType);
+				while (fi.hasNext()) {
+					SimpleFeature source = fi.next();
+					fb.reset();
+					for (String sname : mapping.keySet()) {
+						fb.set(mapping.get(sname), source.getAttribute(sname));
+					}
+					SimpleFeature target = fb.buildFeature(null);
+					jdbcFstore.addFeatures(DataUtilities.collection(target));
+
+					result = new ListFeatureCollection(targetType);
+					((ListFeatureCollection)result).add(source);
+				}
+			}
 		}
 		t.commit();		
 		t.close();
@@ -333,26 +386,52 @@ public class WFSLog implements GSProcess {
 
 		// start a transaction and fill the target with the input features
 		Transaction t = new DefaultTransaction();
-		SimpleFeatureStore fstore = (SimpleFeatureStore) ds
-				.getFeatureSource(targetType.getTypeName());
-		fstore.setTransaction(t);
-		SimpleFeatureIterator fi = features.features();
-		SimpleFeatureBuilder fb = new SimpleFeatureBuilder(targetType);
-		while (fi.hasNext()) {
-			SimpleFeature source = fi.next();
-			fb.reset();
-			for (String sname : mapping.keySet()) {
-				fb.set(mapping.get(sname), source.getAttribute(sname));
+		
+		SimpleFeatureSource fSource = ds.getFeatureSource(targetType.getTypeName());
+		
+		if (fSource instanceof SimpleFeatureStore)
+		{
+			SimpleFeatureStore simpleFstore = (SimpleFeatureStore) fSource;
+			simpleFstore.setTransaction(t);
+			SimpleFeatureIterator fi = features.features();
+			SimpleFeatureBuilder fb = new SimpleFeatureBuilder(targetType);
+			while (fi.hasNext()) {
+				SimpleFeature source = fi.next();
+				fb.reset();
+				for (String sname : mapping.keySet()) {
+					fb.set(mapping.get(sname), source.getAttribute(sname));
+				}
+				SimpleFeature target = fb.buildFeature(null);
+				simpleFstore.addFeatures(DataUtilities.collection(target));
+
+				result = new ListFeatureCollection(targetType);
+				((ListFeatureCollection)result).add(source);
 			}
-			SimpleFeature target = fb.buildFeature(null);
-			fstore.addFeatures(DataUtilities.collection(target));
-			
-			result = new ListFeatureCollection(targetType);
-			result.add(source);
 		}
+
+		else if (fSource instanceof JDBCFeatureStore)
+		{
+			JDBCFeatureStore jdbcFstore = (JDBCFeatureStore) fSource;
+			jdbcFstore.setTransaction(t);
+			SimpleFeatureIterator fi = features.features();
+			SimpleFeatureBuilder fb = new SimpleFeatureBuilder(targetType);
+			while (fi.hasNext()) {
+				SimpleFeature source = fi.next();
+				fb.reset();
+				for (String sname : mapping.keySet()) {
+					fb.set(mapping.get(sname), source.getAttribute(sname));
+				}
+				SimpleFeature target = fb.buildFeature(null);
+				jdbcFstore.addFeatures(DataUtilities.collection(target));
+
+				result = new ListFeatureCollection(targetType);
+				((ListFeatureCollection)result).add(source);
+			}
+		}
+
 		t.commit();		
 		t.close();
-
+		
 		return result;
 	}
 

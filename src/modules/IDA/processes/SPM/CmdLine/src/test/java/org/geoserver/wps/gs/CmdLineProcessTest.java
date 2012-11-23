@@ -1,8 +1,5 @@
 package org.geoserver.wps.gs;
 
-import java.io.File;
-import java.util.Arrays;
-
 import org.geoserver.test.GeoServerTestSupport;
 
 public class CmdLineProcessTest extends GeoServerTestSupport {
@@ -10,7 +7,7 @@ public class CmdLineProcessTest extends GeoServerTestSupport {
      * Try to re-import buildings as another layer (different name, different projection)
      */
     public void testCmdLine() throws Exception {
-        CmdLine cmdLineProcess = new CmdLine();
+        CmdLine cmdLineProcess = new CmdLine(getGeoServer());
 
 		// --silent --eval \"rxlevel({_SPL},{_LAT},{_LON},{_FILEPATH});\" --path C:/Programmi/MMRM-TDA/matlabcode2/
         // --verbose --eval \"rxlevel(1,40,6,\\\"C:/data/NURC-IDA/output/test_\\\");\" --path C:/data/NURC-IDA/matlabcode2/

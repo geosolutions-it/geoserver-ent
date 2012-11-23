@@ -24,7 +24,8 @@ public class IDASoundPropagationModelProcessTest extends GeoServerTestSupport {
         
 		SimpleFeatureCollection features = 
         	idaSPMProcess.execute(
-        			"octave_config_file_path",
+        			"C:/Octave/3.2.4_gcc-4.4.0/bin/octave.exe",
+        			"C:/data/NURC-IDA/matlabcode2/",
         			"user_id",
         			"name",
         			new URL("http://output_url"),

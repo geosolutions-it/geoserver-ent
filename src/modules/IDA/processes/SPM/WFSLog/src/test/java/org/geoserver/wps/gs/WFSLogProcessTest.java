@@ -27,7 +27,7 @@ public class WFSLogProcessTest extends GeoServerTestSupport {
         SimpleFeature feature = rawSource.subCollection(filter).features().next();
         
         SimpleFeatureCollection features = 
-        	wfsLogProcess.execute(rawSource, MockData.BUILDINGS.getLocalPart(), MockData.CITE_PREFIX, MockData.CITE_PREFIX, filter, null);
+        	wfsLogProcess.execute(rawSource, MockData.BUILDINGS.getLocalPart(), MockData.CITE_PREFIX, MockData.CITE_PREFIX, filter, false, null);
         
         assertNotNull(features);
         
