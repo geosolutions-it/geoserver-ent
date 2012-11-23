@@ -23,13 +23,13 @@
     <parent>
         <groupId>it.geosolutions.geoserver</groupId>
         <artifactId>geoserver</artifactId>
-        <version>2.1-SNAPSHOT</version>
+        <version>2.3-SNAPSHOT</version>
     </parent>
 
     <groupId>it.geosolutions.geoserver</groupId>
     <artifactId>geoserver-modules</artifactId>
     <!-- Use the same version as GeoServer here, at least for the moment -->
-    <version>2.1-SNAPSHOT</version>
+    <version>2.3-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>GeoServer Enterprise modules</name>
@@ -166,6 +166,24 @@
             </plugins>
           </build>
       </profile>
+		<!-- ======================================== -->
+		<!-- NURC IDA -->
+		<!-- ======================================== -->
+		<profile>
+			<id>ida</id>
+			<activation>
+				<property>
+					<name>all</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<modules>
+				<module>IDA\processes\SPM\CmdLine</module>
+				<module>IDA\processes\SPM\ToFeature</module>
+				<module>IDA\processes\SPM\WFSLog</module>
+				<module>IDA\processes\SPM\IDASoundPropagationModel</module>
+			</modules>
+		</profile>
 		<!-- ======================================== -->
 		<!-- Turbo JPEG -->
 		<!-- ======================================== -->
