@@ -5,12 +5,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.net.URL;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -254,7 +258,10 @@ public class IDASoundPropagationModelProcess implements GSProcess {
             
             // Build the data-model
             Map<String, Object> data = new HashMap<String, Object>();
-            data.put("soundSourceUnit", soundSourceUnit);
+            NumberFormat nff = new DecimalFormat("#0.00000#");
+            ((DecimalFormat)nff).setDecimalFormatSymbols(DecimalFormatSymbols.getInstance(Locale.US));
+            data.put("soundSourceUnitX", nff.format(soundSourceUnit.getX()));
+            data.put("soundSourceUnitY", nff.format(soundSourceUnit.getY()));
             data.put("season", season);
             if(soundVelocityProfile!=null && !soundVelocityProfile.isEmpty())
             {

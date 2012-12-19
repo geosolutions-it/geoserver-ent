@@ -20,7 +20,7 @@ public class IDASoundPropagationModelProcessTest extends GeoServerTestSupport {
     public void testIDASoundPropagationModel() throws Exception {
     	IDASoundPropagationModelProcess idaSPMProcess = new IDASoundPropagationModelProcess(getGeoServer());
 		
-        Point footprint = JTS.toGeometry(new GeneralDirectPosition(6, 40));
+        Point footprint = JTS.toGeometry(new GeneralDirectPosition(5.23044, 38.66605));
         
 		SimpleFeatureCollection features = 
         	idaSPMProcess.execute(
