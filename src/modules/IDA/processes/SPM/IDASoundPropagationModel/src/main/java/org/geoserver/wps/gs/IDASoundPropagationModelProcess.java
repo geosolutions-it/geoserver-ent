@@ -1,11 +1,19 @@
 package org.geoserver.wps.gs;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.UUID;
 import java.util.logging.Logger;
 
@@ -39,6 +47,9 @@ import org.opengis.util.ProgressListener;
 
 import com.vividsolutions.jts.geom.Point;
 
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+
 @DescribeProcess(title = "IDA Sound Propagation Model", description = "SPM Workflow. Gets SPM input params, logs to the DB and executes Matlab code.")
 public class IDASoundPropagationModelProcess implements GSProcess {
 
@@ -61,26 +72,33 @@ public class IDASoundPropagationModelProcess implements GSProcess {
 	
 	@DescribeResult(name = "result", description = "List of attributes to be converted to a FeatureType")
 	public SimpleFeatureCollection execute(
-			@DescribeParameter(name = "octaveExecutablePath", min = 1, description = "Octave Executable file full path") String octaveExecutablePath,
-			@DescribeParameter(name = "octaveConfigFilePath", min = 1, description = "Octave Config file full path") String octaveConfigFilePath,
-			@DescribeParameter(name = "userId", min = 1, description = "SPM attribute user_id") String userId,
-			@DescribeParameter(name = "name", min = 1, description = "SPM attribute name") String name,
-			@DescribeParameter(name = "outputUrl", description = "SPM attribute output_url") URL outputUrl,
-			@DescribeParameter(name = "runBegin", description = "SPM attribute run_begin") Date runBegin,
-			@DescribeParameter(name = "runEnd", description = "SPM attribute run_end") Date runEnd,
-			@DescribeParameter(name = "itemStatus", description = "SPM attribute item_status") String itemStatus,
-			@DescribeParameter(name = "itemStatusMessage", description = "SPM attribute item_status_message") String itemStatusMessage,
-			@DescribeParameter(name = "wsName", min = 1, description = "SPM attribute workspace_name") String wsName,
-			@DescribeParameter(name = "storeName", description = "SPM attribute store_name") String storeName,
-			@DescribeParameter(name = "layerName", description = "SPM attribute layer_name") String layerName,
-			@DescribeParameter(name = "securityLevel", description = "SPM attribute security_level") String securityLevel,
-			@DescribeParameter(name = "srcPath", description = "SPM attribute src_path") String srcPath,
+			@DescribeParameter(name = "userId", min = 1, description = "SPM attribute userId") String userId,
+			@DescribeParameter(name = "modelName", min = 1, description = "SPM attribute modelName") String name,
+			@DescribeParameter(name = "outputUrl", min = 0, description = "SPM attribute outputUrl") URL outputUrl,
+			@DescribeParameter(name = "runBegin", min = 1, description = "SPM attribute runBegin") Date runBegin,
+			@DescribeParameter(name = "runEnd", min = 0, description = "SPM attribute runEnd") Date runEnd,
+			@DescribeParameter(name = "itemStatus", min = 0, description = "SPM attribute item_status") String itemStatus,
+			@DescribeParameter(name = "itemStatusMessage", min = 0, description = "SPM attribute itemStatusMessage") String itemStatusMessage,
+			@DescribeParameter(name = "wsName", min = 1, description = "SPM attribute workspaceName") String wsName,
+			@DescribeParameter(name = "storeName", min = 0, description = "SPM attribute storeName") String storeName,
+			@DescribeParameter(name = "layerName", min = 0, description = "SPM attribute layerName") String layerName,
+			@DescribeParameter(name = "styleName", min = 0, description = "SPM attribute styleName") String styleName,
+			@DescribeParameter(name = "srcPath", min = 0, description = "SPM attribute src_path") String srcPath,
 			@DescribeParameter(name = "season", description = "SPM attribute season") String season,
-			@DescribeParameter(name = "srcFrequency", description = "SPM attribute src_frequency") Double srcFrequency,
-			@DescribeParameter(name = "srcPressureLevel", description = "SPM attribute src_pressure_level") Double srcPressureLevel,
-			@DescribeParameter(name = "footprint", description = "SPM attribute footprint") Point footprint,
+			@DescribeParameter(name = "sourceDepth", description = "SPM attribute sourceDepth") Double sourceDepth,
+			@DescribeParameter(name = "sourceFrequency", description = "SPM attribute sourceFrequency") Double sourceFrequency,
+			@DescribeParameter(name = "sourcePressureLevel", description = "SPM attribute src_pressure_level") Double sourcePressureLevel,
+			@DescribeParameter(name = "soundVelocityProfile", min = 0, description = "SPM attribute soundVelocityProfile") String soundVelocityProfile,
+			@DescribeParameter(name = "advParams", min = 0, description = "SPM attribute advancedParams (par1;par2)") String advParams,
+			@DescribeParameter(name = "soundSourceUnit", description = "SPM attribute footprint") Point soundSourceUnit,
 			ProgressListener progressListener) throws ProcessException {
 
+		List<String> advancedParams = null;
+		if (advParams != null && advParams.length()>0)
+		{
+			advancedParams = Arrays.asList(advParams.split(";"));
+		}
+		
 		// first off, decide what is the target store
 		WorkspaceInfo ws;
 		if (wsName != null) {
@@ -106,11 +124,11 @@ public class IDASoundPropagationModelProcess implements GSProcess {
 
 		CoordinateReferenceSystem crs;
 		try {
-			if (footprint.getSRID() <= 0) {
+			if (soundSourceUnit.getSRID() <= 0) {
 				crs = CRS.decode("EPSG:4326");
-				footprint.setSRID(4326);
+				soundSourceUnit.setSRID(4326);
 			} else {
-				crs = CRS.decode("EPSG:" + footprint.getSRID());
+				crs = CRS.decode("EPSG:" + soundSourceUnit.getSRID());
 			}
 		} catch (NoSuchAuthorityCodeException e) {
 			if (progressListener != null)
@@ -128,24 +146,24 @@ public class IDASoundPropagationModelProcess implements GSProcess {
 
 		UUID uuid = UUID.randomUUID();
 		attributes.add(new FeatureAttribute("ftUUID", uuid.toString()));
-		attributes.add(new FeatureAttribute("octaveConfigFilePath", octaveConfigFilePath));
 		attributes.add(new FeatureAttribute("userId", userId));
-		attributes.add(new FeatureAttribute("name", name));
+		attributes.add(new FeatureAttribute("modelName", name));
 		attributes.add(new FeatureAttribute("outputUrl", outputUrl.toExternalForm()));
 		attributes.add(new FeatureAttribute("runBegin", runBegin));
-		attributes.add(new FeatureAttribute("runEnd", runEnd));
+		attributes.add(new FeatureAttribute("runEnd", (runEnd!=null?runEnd:new Date())));
 		attributes.add(new FeatureAttribute("itemStatus", (itemStatus != null ? itemStatus : "CREATED")));
-		attributes.add(new FeatureAttribute("itemStatusMessage", itemStatusMessage));
+		attributes.add(new FeatureAttribute("itemStatusMessage", (itemStatusMessage != null ? itemStatusMessage : "Instrumented by Server")));
 		attributes.add(new FeatureAttribute("wsName", wsName));
-		attributes.add(new FeatureAttribute("storeName", storeName));
-		attributes.add(new FeatureAttribute("layerName", layerName));
-		attributes.add(new FeatureAttribute("securityLevel", securityLevel));
-		attributes.add(new FeatureAttribute("srcPath", srcPath));
-		attributes.add(new FeatureAttribute("season", season));
-		attributes.add(new FeatureAttribute("srcFrequency", srcFrequency));
-		attributes.add(new FeatureAttribute("srcPressureLevel", srcPressureLevel));
+		attributes.add(new FeatureAttribute("storeName", (storeName != null ? storeName : "")));
+		attributes.add(new FeatureAttribute("layerName", (layerName != null ? layerName : "")));
+		attributes.add(new FeatureAttribute("srcPath", (srcPath != null ? srcPath : "")));
+		attributes.add(new FeatureAttribute("season", (season != null ? season : "")));
+		attributes.add(new FeatureAttribute("sourceDepth", (sourceDepth != null ? sourceDepth : 0.0)));
+		attributes.add(new FeatureAttribute("sourceFrequency", (sourceFrequency != null ? sourceFrequency : 0.0)));
+		attributes.add(new FeatureAttribute("sourcePressureLevel", (sourcePressureLevel != null ? sourcePressureLevel : 0.0)));
+		attributes.add(new FeatureAttribute("soundVelocityProfile", (soundVelocityProfile != null ? soundVelocityProfile : "")));
 
-		SimpleFeatureCollection features = toFeatureProcess.execute(footprint, crs, DEFAULT_TYPE_NAME, attributes, null);
+		SimpleFeatureCollection features = toFeatureProcess.execute(soundSourceUnit, crs, DEFAULT_TYPE_NAME, attributes, null);
 		
 		if (progressListener != null)
 		{
@@ -189,34 +207,114 @@ public class IDASoundPropagationModelProcess implements GSProcess {
 		
 		try
 		{
-			final File directory = catalog.getResourceLoader().findOrCreateDirectory("data", wsName, storeName);
-			//final File directory = new File("C:/data/NURC-IDA/output/");
-    		f = new File(directory, name + "_");
+			Properties idaExecProperties = new Properties();
+			idaExecProperties.load(IDASoundPropagationModelProcess.class.getClassLoader().getResourceAsStream("ida-exec.properties"));
+			
+			List<String> cmdOptionPath = new LinkedList<String>();
+			
+			String executablePath = idaExecProperties.getProperty("executable.command");
+			cmdOptionPath.add(executablePath);
+			
+			for(Entry<Object, Object> entry : idaExecProperties.entrySet())
+			{
+				if (entry.getKey().toString().startsWith("option."))
+				{
+					String optionName = entry.getKey().toString().substring("option.".length());
+					String optionValue = (String) entry.getValue();
+					
+					if (optionName!=null && !optionName.trim().isEmpty())
+					{
+						cmdOptionPath.add((optionName.trim().length()==1?"-":"--") + optionName.trim());
+					}
+
+					if (optionValue!=null && !optionValue.trim().isEmpty())
+					{
+						cmdOptionPath.add(optionValue.trim());
+					}
+				}
+			}
+
+			//Freemarker configuration object
+
+			//final File directory = catalog.getResourceLoader().findOrCreateDirectory("data", wsName, storeName);
+			final File directory = new File(idaExecProperties.getProperty("output.path"));
+			f = new File(directory, name + "_");
+
+	        File templateFile = new File(idaExecProperties.getProperty("input.path") + "/" + idaExecProperties.getProperty("input.template"));
+	        if (!templateFile.exists() || !templateFile.isFile() || !templateFile.canRead())
+	        {
+	        	throw new IOException("Input template file is not accessible or cannot be read.");
+	        }
+
+	        Configuration cfg = new Configuration();
+	        cfg.setDirectoryForTemplateLoading(new File(idaExecProperties.getProperty("input.path")));
+	        cfg.setLocalizedLookup(false);
+	        
+            Template template = cfg.getTemplate(idaExecProperties.getProperty("input.template"));
+            
+            // Build the data-model
+            Map<String, Object> data = new HashMap<String, Object>();
+            data.put("soundSourceUnit", soundSourceUnit);
+            data.put("season", season);
+            if(soundVelocityProfile!=null && !soundVelocityProfile.isEmpty())
+            {
+            	File sndProfilePath = new File(soundVelocityProfile);
+            	
+            	if(sndProfilePath.exists() && sndProfilePath.isFile() && !sndProfilePath.isDirectory() && sndProfilePath.canWrite())
+            	{
+            		File sndProfDest = new File(idaExecProperties.getProperty("input.profiles.folder"), FilenameUtils.getBaseName(soundVelocityProfile));
+					if(sndProfilePath.renameTo(sndProfDest))
+					{
+						data.put("soundVelocityProfile", sndProfDest.getAbsolutePath());
+					}
+					else
+					{
+						data.put("soundVelocityProfile", "<-- ERROR occurred while processing the input sound velocity profile file -->");
+					}
+            	}
+            }
+            data.put("sourceDepth", sourceDepth);
+            data.put("sourceFrequency", sourceFrequency);
+            data.put("sourcePressureLevel", sourcePressureLevel);
+            data.put("modelName", name);
+            data.put("advancedParams", advancedParams);
+            data.put("outputPath", f.getAbsolutePath().replaceAll("\\\\", "/"));
+            
+            // File output
+            File inputFile = File.createTempFile("idaExecInputTemplate_" + System.nanoTime(), ".txt");
+            Writer file = new FileWriter (inputFile);
+            template.process(data, file);
+            file.flush();
+            file.close();
+            
+            cmdOptionPath.add(inputFile.getAbsolutePath());
     		
 			CmdLine cmdLineProcess = new CmdLine(geoServer);
 
 			// --silent --eval \"rxlevel({_SPL},{_LAT},{_LON},{_FILEPATH});\" --path C:/Programmi/MMRM-TDA/matlabcode2/
 	        // --verbose --eval \"rxlevel(1,40,6,\\\"C:/data/NURC-IDA/output/test_\\\");\" --path C:/data/NURC-IDA/matlabcode2/
-			LOGGER.info("Executing Octave command with parameters: " + Arrays.asList(
-    				octaveExecutablePath, 
-    				"--silent", //"", 
-    				"--eval", "\"rxlevel("+(srcPressureLevel==0||Double.isNaN(srcPressureLevel)?1:srcPressureLevel)+","+footprint.getY()+","+footprint.getX()+",\\\""+f.getAbsolutePath().replaceAll("\\\\", "/")+"\\\");\"", 
-    				"--path", octaveConfigFilePath));
+			LOGGER.info("Executing Octave command with parameters: " + cmdOptionPath);
 
-			String results = cmdLineProcess.execute(
+			/*String results = cmdLineProcess.execute(
 	        		Arrays.asList(
-	        				octaveExecutablePath, 
+	        				executablePath, 
 	        				//"--silent", //"",
 	        				"--eval", "rxlevel("+(srcPressureLevel==0||Double.isNaN(srcPressureLevel)?1:srcPressureLevel)+","+footprint.getY()+","+footprint.getX()+",\""+f.getAbsolutePath().replaceAll("\\\\", "/")+"\");", 
 	        				"--path", octaveConfigFilePath,
 	        				"--verbose"),
 	        		directory,
 	        		true,
+	        		new NullProgressListener());*/
+
+			String results = cmdLineProcess.execute(
+					cmdOptionPath,
+	        		directory,
+	        		true,
 	        		new NullProgressListener());
 
 			LOGGER.info("Command Line Process results : " + results);
 			
-			f = new File(directory, name + "_ASCIIgrid.asc");
+			f = new File(directory, idaExecProperties.getProperty("output.prefix") + name + "_" + idaExecProperties.getProperty("output.suffix"));
 			
 			LOGGER.info("Trying to read ASC file: " + f.getAbsolutePath());
 			
@@ -251,7 +349,6 @@ public class IDASoundPropagationModelProcess implements GSProcess {
 
 		final String spmRasterStoreName = FilenameUtils.getBaseName(f.getAbsolutePath());
 		final String spmRasterLayerName = FilenameUtils.getBaseName(f.getAbsolutePath());
-		final String styleName = "spm";
 
 		/**
 		 * Import output Octave ASC layer into GeoServer
@@ -265,7 +362,7 @@ public class IDASoundPropagationModelProcess implements GSProcess {
 				spmRasterLayerName,
 				crs,
 				null,
-				styleName);
+				(styleName!=null?styleName:"spm"));
 		
 		if (result == null || !result.contains(spmRasterLayerName))
 		{
@@ -338,6 +435,7 @@ public class IDASoundPropagationModelProcess implements GSProcess {
 	        feature.setAttribute("layerName", spmRasterLayerName);
 	        feature.setAttribute("runEnd", new Date());
 	        feature.setAttribute("itemStatus", "COMPLETED");
+	        feature.setAttribute("srcPath", f.getAbsolutePath());
 	        
 	        ListFeatureCollection output = new ListFeatureCollection(features.getSchema());
 	        output.add(feature);
