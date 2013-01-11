@@ -3,7 +3,7 @@
 
 <beans>
 
-	<bean id="nurcIDASoundPropagationModelProcess" class="org.geoserver.wps.gs.IDASoundPropagationModelProcess">
+	<bean id="nurcIDARasterAlgebraProcess" class="org.geoserver.wps.gs.IDARasterAlgebraProcess">
 		<constructor-arg index="0" ref="geoServer"/>
 	</bean>
 

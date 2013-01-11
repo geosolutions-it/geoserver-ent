@@ -23,6 +23,7 @@ import org.geoserver.wps.WPSException;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataUtilities;
 import org.geotools.data.DefaultTransaction;
+import org.geotools.data.FeatureWriter;
 import org.geotools.data.Transaction;
 import org.geotools.data.collection.ListFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureCollection;
@@ -31,6 +32,7 @@ import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotools.jdbc.JDBCFeatureSource;
 import org.geotools.jdbc.JDBCFeatureStore;
 import org.geotools.process.ProcessException;
 import org.geotools.process.factory.DescribeParameter;
@@ -424,6 +426,25 @@ public class WFSLog implements GSProcess {
 				SimpleFeature target = fb.buildFeature(null);
 				jdbcFstore.addFeatures(DataUtilities.collection(target));
 
+				result = new ListFeatureCollection(targetType);
+				((ListFeatureCollection)result).add(source);
+			}
+		}
+		
+		else if (fSource instanceof JDBCFeatureSource)
+		{
+			JDBCFeatureSource jdbcFsource = (JDBCFeatureSource) fSource;
+			FeatureWriter<SimpleFeatureType, SimpleFeature> ftWriter = jdbcFsource.getDataStore().getFeatureWriter(targetType.getTypeName(), t);
+			jdbcFsource.setTransaction(t);
+			SimpleFeatureIterator fi = features.features();
+			while (fi.hasNext()) {
+				SimpleFeature source = fi.next();
+				SimpleFeature target = ftWriter.next();
+
+				for (String sname : mapping.keySet()) {
+					target.setAttribute(sname, source.getAttribute(sname));
+				}
+				ftWriter.write();
 				result = new ListFeatureCollection(targetType);
 				((ListFeatureCollection)result).add(source);
 			}

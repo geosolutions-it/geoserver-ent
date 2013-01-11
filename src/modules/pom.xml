@@ -182,6 +182,7 @@
 				<module>IDA\processes\SPM\ToFeature</module>
 				<module>IDA\processes\SPM\WFSLog</module>
 				<module>IDA\processes\SPM\IDASoundPropagationModel</module>
+				<module>IDA\processes\Raster\IDARasterAlgebraProcess</module>
 			</modules>
 		</profile>
 		<!-- ======================================== -->
