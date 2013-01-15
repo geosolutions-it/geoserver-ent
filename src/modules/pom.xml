@@ -183,6 +183,7 @@
 				<module>IDA\processes\SPM\WFSLog</module>
 				<module>IDA\processes\SPM\IDASoundPropagationModel</module>
 				<module>IDA\processes\Raster\IDARasterAlgebraProcess</module>
+				<module>IDA\wfs\IDADeleteTransactionListener</module>
 			</modules>
 		</profile>
 		<!-- ======================================== -->
