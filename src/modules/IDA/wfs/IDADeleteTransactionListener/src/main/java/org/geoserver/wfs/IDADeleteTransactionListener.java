@@ -23,8 +23,7 @@ import org.opengis.feature.simple.SimpleFeature;
 
 public class IDADeleteTransactionListener implements TransactionListener {
 
-	protected static final Logger LOGGER = Logging
-			.getLogger(IDADeleteTransactionListener.class);
+	protected static final Logger LOGGER = Logging.getLogger(IDADeleteTransactionListener.class);
 
 	protected GeoServer geoServer;
 
@@ -46,6 +45,7 @@ public class IDADeleteTransactionListener implements TransactionListener {
 	public void dataStoreChange(TransactionEvent event) throws WFSException {
 		events.add(event);
 		String typeName = event.getAffectedFeatures().getSchema().getTypeName();
+		// check the correct event type and the correct FeatureType Name
 		if ((typeName.contains(IDARasterAlgebraProcess.DEFAULT_TYPE_NAME) || typeName.contains(IDASoundPropagationModelProcess.DEFAULT_TYPE_NAME)) && TransactionEventType.PRE_DELETE == event.getType()) {
 			features.addAll(DataUtilities.list(event.getAffectedFeatures()));
 			for (Object ft : features) {
@@ -53,6 +53,7 @@ public class IDADeleteTransactionListener implements TransactionListener {
 					WorkspaceInfo ws = null;
 					DataStoreInfo storeInfo = null;
 					try {
+						// retrieve workspace and store as inserted in the feature attributes
 						SimpleFeature next = (SimpleFeature) ft;
 						String wsName = (String) next.getAttribute("wsName");
 						String storeName = (String) next.getAttribute("storeName");
@@ -60,6 +61,7 @@ public class IDADeleteTransactionListener implements TransactionListener {
 						if (wsName != null && storeName != null
 								&& wsName.length() > 0
 								&& storeName.length() > 0) {
+							// being sure the workspace exists in the catalog
 							ws = catalog.getWorkspaceByName(wsName);
 							if (ws == null) {
 								LOGGER.severe("Could not retrive WorkSpace "
@@ -67,6 +69,7 @@ public class IDADeleteTransactionListener implements TransactionListener {
 							}
 
 							if (ws != null) {
+								// being sure the store exists in the catalog
 								storeInfo = catalog.getDataStoreByName(wsName,
 										storeName);
 								
@@ -77,14 +80,20 @@ public class IDADeleteTransactionListener implements TransactionListener {
 						            List<LayerInfo> layers = catalog.getLayers(ri);
 						            if (!layers.isEmpty()){ 
 						                for (LayerInfo li : layers) {
+						                	// counting the store layers, if 0 we can remove the whole store too ...
 						                	layersInStore++;
+						                	// we need to check the layer name start, since for the coverages a timestamp is attached to the name
 						                	if (layerName != null && li.getName().startsWith(layerName))
+						                	{
 						                		catalog.remove(li);
+						                		layersInStore--;
+						                	}
 						                }
 						            }
 						        }
 						        
-						        if (layersInStore <= 1)
+						        // the store does not contain layers anymore, lets remove it from the catalog then
+						        if (layersInStore == 0)
 						        	catalog.remove(storeInfo);
 								
 								if (storeInfo == null) {
@@ -95,13 +104,27 @@ public class IDADeleteTransactionListener implements TransactionListener {
 						}
 
 						String srcPath = (String) next.getAttribute("srcPath");
-						if (ws != null && storeInfo != null && srcPath != null
-								&& srcPath.length() > 0) {
+						if (ws != null && storeInfo != null && srcPath != null && srcPath.length() > 0) {
 							File file = new File(srcPath);
 
-							if (file.exists() && file.isFile()
-									&& file.canWrite()) {
-								if (!file.delete())
+							// try to delete the file several times since it may be locked by catalog for some reason
+							if (file.exists() && file.isFile() && file.canWrite()) {
+								final int retries = 10;
+								int tryDelete = 0;
+								for (; tryDelete < 5; tryDelete++)
+								{
+									if (file.delete())
+									{
+										break;
+									}
+									else
+									{
+										// wait 5 seconds and try again...
+										Thread.sleep(5000);
+									}
+								}
+								
+								if (tryDelete > retries)
 								{
 									LOGGER.severe("Could not delete file "+srcPath+" from the FileSystem");
 								}
@@ -109,6 +132,7 @@ public class IDADeleteTransactionListener implements TransactionListener {
 						}
 					} catch (Exception e) {
 						LOGGER.severe("Exception occurred during Deletion: "+e.getLocalizedMessage());
+						throw new WFSException(e);
 					} finally {
 					}
 				}
