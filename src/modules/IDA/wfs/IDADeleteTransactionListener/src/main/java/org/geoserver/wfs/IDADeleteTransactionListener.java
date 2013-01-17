@@ -7,12 +7,13 @@ package org.geoserver.wfs;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.geoserver.catalog.Catalog;
-import org.geoserver.catalog.DataStoreInfo;
 import org.geoserver.catalog.LayerInfo;
 import org.geoserver.catalog.ResourceInfo;
+import org.geoserver.catalog.StoreInfo;
 import org.geoserver.catalog.WorkspaceInfo;
 import org.geoserver.config.GeoServer;
 import org.geoserver.wps.gs.IDARasterAlgebraProcess;
@@ -45,19 +46,39 @@ public class IDADeleteTransactionListener implements TransactionListener {
 	public void dataStoreChange(TransactionEvent event) throws WFSException {
 		events.add(event);
 		String typeName = event.getAffectedFeatures().getSchema().getTypeName();
+		
+		if (LOGGER.isLoggable(Level.FINE))
+		{
+			LOGGER.fine("IDATxLIstener - catched request for FeatureType: " + typeName);
+		}
+		
 		// check the correct event type and the correct FeatureType Name
 		if ((typeName.contains(IDARasterAlgebraProcess.DEFAULT_TYPE_NAME) || typeName.contains(IDASoundPropagationModelProcess.DEFAULT_TYPE_NAME)) && TransactionEventType.PRE_DELETE == event.getType()) {
 			features.addAll(DataUtilities.list(event.getAffectedFeatures()));
 			for (Object ft : features) {
 				if (ft instanceof SimpleFeature) {
 					WorkspaceInfo ws = null;
-					DataStoreInfo storeInfo = null;
+					StoreInfo storeInfo = null;
 					try {
 						// retrieve workspace and store as inserted in the feature attributes
 						SimpleFeature next = (SimpleFeature) ft;
+						
+						if (LOGGER.isLoggable(Level.FINE))
+						{
+							LOGGER.fine("IDATxLIstener - checking feature: " + next.getID());
+						}
+
 						String wsName = (String) next.getAttribute("wsName");
 						String storeName = (String) next.getAttribute("storeName");
 						String layerName = (String) next.getAttribute("layerName");
+
+						if (LOGGER.isLoggable(Level.FINE))
+						{
+							LOGGER.fine("IDATxLIstener - wsName: " + wsName);
+							LOGGER.fine("IDATxLIstener - storeName: " + storeName);
+							LOGGER.fine("IDATxLIstener - layerName: " + layerName);
+						}
+
 						if (wsName != null && storeName != null
 								&& wsName.length() > 0
 								&& storeName.length() > 0) {
@@ -70,40 +91,82 @@ public class IDADeleteTransactionListener implements TransactionListener {
 
 							if (ws != null) {
 								// being sure the store exists in the catalog
-								storeInfo = catalog.getDataStoreByName(wsName,
-										storeName);
-								
-								// drill down into layers (into resources since we cannot scan layers)
-								int layersInStore = 0;
-						        List<ResourceInfo> resources = catalog.getResourcesByStore(storeInfo, ResourceInfo.class);
-						        for (ResourceInfo ri : resources) {
-						            List<LayerInfo> layers = catalog.getLayers(ri);
-						            if (!layers.isEmpty()){ 
-						                for (LayerInfo li : layers) {
-						                	// counting the store layers, if 0 we can remove the whole store too ...
-						                	layersInStore++;
-						                	// we need to check the layer name start, since for the coverages a timestamp is attached to the name
-						                	if (layerName != null && li.getName().startsWith(layerName))
-						                	{
-						                		catalog.remove(li);
-						                		layersInStore--;
-						                	}
-						                }
-						            }
-						        }
-						        
-						        // the store does not contain layers anymore, lets remove it from the catalog then
-						        if (layersInStore == 0)
-						        	catalog.remove(storeInfo);
-								
+								storeInfo = catalog.getDataStoreByName(ws.getName(), storeName.trim());
+								storeInfo = (storeInfo == null ? catalog.getCoverageStoreByName(ws.getName(), storeName.trim()) : storeInfo);
+
 								if (storeInfo == null) {
 									LOGGER.severe("Could not retrive DataStore "
 											+ storeName + " into the Catalog");
+								}
+								else
+								{
+									// drill down into layers (into resources since we cannot scan layers)
+									int layersInStore = 0;
+									try
+									{
+								        List<ResourceInfo> resources = catalog.getResourcesByStore(storeInfo, ResourceInfo.class);
+								        for (ResourceInfo ri : resources) {
+								            List<LayerInfo> layers = catalog.getLayers(ri);
+								            if (!layers.isEmpty()){ 
+								                for (LayerInfo li : layers) {
+								                	// counting the store layers, if 0 we can remove the whole store too ...
+								                	layersInStore++;
+								                	// we need to check the layer name start, since for the coverages a timestamp is attached to the name
+							                		
+								                	if (LOGGER.isLoggable(Level.FINE))
+													{
+														LOGGER.fine("IDATxLIstener - going to check layer: " + li.getName() + " against feture layer attribute: " + layerName);
+													}
+	
+							                		if (layerName != null && li != null && li.getName() != null && li.getName().startsWith(layerName))
+								                	{
+								                		catalog.remove(li);
+								                		catalog.remove(li.getResource());
+								                		layersInStore--;
+	
+								                		if (LOGGER.isLoggable(Level.FINE))
+														{
+															LOGGER.fine("IDATxLIstener - removed layer: " + li.getName());
+														}
+								                	}
+								                }
+								            }
+								        }
+								        
+								        // the store does not contain layers anymore, lets remove it from the catalog then
+								        
+								        if (LOGGER.isLoggable(Level.FINE))
+										{
+											LOGGER.fine("IDATxLIstener - remaining layers for this store: " + layersInStore);
+										}
+								        
+								        if (layersInStore == 0)
+								        {
+								        	geoServer.reload();
+								        	catalog.remove(storeInfo);
+	
+									        if (LOGGER.isLoggable(Level.FINE))
+											{
+												LOGGER.fine("IDATxLIstener - removed store: " + storeInfo.getName());
+											}
+								        }
+									}
+									catch (Exception e)
+									{
+										LOGGER.severe("Could not remove store and layer from catalog: " + e.getLocalizedMessage());
+										
+									}
 								}
 							}
 						}
 
 						String srcPath = (String) next.getAttribute("srcPath");
+						
+				        if (LOGGER.isLoggable(Level.FINE))
+						{
+							LOGGER.fine("IDATxLIstener - going to delete file: " + srcPath);
+						}
+
 						if (ws != null && storeInfo != null && srcPath != null && srcPath.length() > 0) {
 							File file = new File(srcPath);
 
@@ -115,11 +178,21 @@ public class IDADeleteTransactionListener implements TransactionListener {
 								{
 									if (file.delete())
 									{
-										break;
+								        if (LOGGER.isLoggable(Level.FINE))
+										{
+											LOGGER.fine("IDATxLIstener - deleted file: " + srcPath);
+										}
+
+								        break;
 									}
 									else
 									{
-										// wait 5 seconds and try again...
+								        if (LOGGER.isLoggable(Level.FINE))
+										{
+											LOGGER.fine("IDATxLIstener - could not delete file: " + srcPath + " ... wait 5 secs and retry...");
+										}
+
+								        // wait 5 seconds and try again...
 										Thread.sleep(5000);
 									}
 								}
