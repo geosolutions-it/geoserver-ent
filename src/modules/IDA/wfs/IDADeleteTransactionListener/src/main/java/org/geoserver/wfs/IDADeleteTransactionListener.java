@@ -142,7 +142,7 @@ public class IDADeleteTransactionListener implements TransactionListener {
 								        
 								        if (layersInStore == 0)
 								        {
-								        	geoServer.reload();
+								        	//geoServer.reload();
 								        	catalog.remove(storeInfo);
 	
 									        if (LOGGER.isLoggable(Level.FINE))

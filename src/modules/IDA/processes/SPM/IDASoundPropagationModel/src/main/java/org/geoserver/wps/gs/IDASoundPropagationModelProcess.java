@@ -78,7 +78,7 @@ public class IDASoundPropagationModelProcess implements GSProcess {
 	public SimpleFeatureCollection execute(
 			@DescribeParameter(name = "userId", min = 1, description = "SPM attribute userId") String userId,
 			@DescribeParameter(name = "modelName", min = 1, description = "SPM attribute modelName") String name,
-			@DescribeParameter(name = "outputUrl", min = 0, description = "SPM attribute outputUrl") URL outputUrl,
+			@DescribeParameter(name = "outputUrl", min = 1, description = "SPM attribute outputUrl") URL outputUrl,
 			@DescribeParameter(name = "runBegin", min = 1, description = "SPM attribute runBegin") Date runBegin,
 			@DescribeParameter(name = "runEnd", min = 0, description = "SPM attribute runEnd") Date runEnd,
 			@DescribeParameter(name = "itemStatus", min = 0, description = "SPM attribute item_status") String itemStatus,

@@ -1,6 +1,7 @@
 package org.geoserver.wps.gs;
 
 import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -121,6 +122,7 @@ public class IDARasterAlgebraProcess implements GSProcess {
 	@DescribeResult(name = "result", description = "List of attributes to be converted to a FeatureType")
 	public SimpleFeatureCollection execute(
 			@DescribeParameter(name = "attributeName", min = 1, description = "RasterAlgebra attribute attributeName") String name,
+			@DescribeParameter(name = "outputUrl", min = 1, description = "SPM attribute outputUrl") URL outputUrl,
 			@DescribeParameter(name = "runBegin", min = 1, description = "SPM attribute runBegin") Date runBegin,
 			@DescribeParameter(name = "runEnd", min = 0, description = "SPM attribute runEnd") Date runEnd,
 			@DescribeParameter(name = "itemStatus", min = 0, description = "SPM attribute item_status") String itemStatus,
@@ -177,6 +179,7 @@ public class IDARasterAlgebraProcess implements GSProcess {
 		UUID uuid = UUID.randomUUID();
 		attributes.add(new FeatureAttribute("ftUUID", uuid.toString()));
 		attributes.add(new FeatureAttribute("attributeName", name));
+		attributes.add(new FeatureAttribute("outputUrl", outputUrl.toExternalForm()));
 		attributes.add(new FeatureAttribute("runBegin", runBegin));
 		attributes.add(new FeatureAttribute("runEnd", (runEnd!=null?runEnd:new Date())));
 		attributes.add(new FeatureAttribute("itemStatus", (itemStatus != null ? itemStatus : "CREATED")));
