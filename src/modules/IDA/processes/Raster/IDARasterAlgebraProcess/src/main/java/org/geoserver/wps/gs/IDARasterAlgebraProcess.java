@@ -16,6 +16,7 @@ import org.geoserver.catalog.WorkspaceInfo;
 import org.geoserver.config.GeoServer;
 import org.geoserver.wps.ppio.FeatureAttribute;
 import org.geoserver.wps.raster.algebra.RasterAlgebraProcess;
+import org.geoserver.wps.raster.algebra.ResolutionChoice;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
@@ -242,7 +243,7 @@ public class IDARasterAlgebraProcess implements GSProcess {
 		try
 		{
 			RasterAlgebraProcess rstAlgebraProcess = new RasterAlgebraProcess(catalog);
-			coverage = rstAlgebraProcess.execute(attributeFilter, null);
+			coverage = rstAlgebraProcess.execute(attributeFilter, null, ResolutionChoice.getDefault());
 			
 			if (coverage == null)
 			{
