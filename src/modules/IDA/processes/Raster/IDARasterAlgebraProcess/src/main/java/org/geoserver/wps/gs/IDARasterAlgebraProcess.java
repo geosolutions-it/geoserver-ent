@@ -9,7 +9,9 @@ import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.apache.commons.io.FilenameUtils;
+import org.geoserver.catalog.AttributionInfo;
 import org.geoserver.catalog.Catalog;
+import org.geoserver.catalog.LayerInfo;
 import org.geoserver.catalog.WorkspaceInfo;
 import org.geoserver.config.GeoServer;
 import org.geoserver.wps.ppio.FeatureAttribute;
@@ -20,6 +22,7 @@ import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
 import org.geotools.data.collection.ListFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.feature.NameImpl;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.gce.geotiff.GeoTiffReader;
 import org.geotools.gce.geotiff.GeoTiffWriteParams;
@@ -471,6 +474,17 @@ public class IDARasterAlgebraProcess implements GSProcess {
 	        feature.setAttribute("runEnd", new Date());
 	        feature.setAttribute("itemStatus", "COMPLETED");
 	        feature.setAttribute("srcPath", f.getAbsolutePath());
+	        
+	        // set layer attribution info
+	        LayerInfo layer = catalog.getLayerByName(new NameImpl(wsName, rstAlgebraRasterLayerName));
+	        if (layer != null)
+	        {
+	        	AttributionInfo attribution = catalog.getFactory().createAttribution();
+	        	attribution.setTitle(classification);
+				layer.setAttribution(attribution);
+				
+				catalog.save(layer);
+	        }
 	        
 	        ListFeatureCollection output = new ListFeatureCollection(features.getSchema());
 	        output.add(feature);

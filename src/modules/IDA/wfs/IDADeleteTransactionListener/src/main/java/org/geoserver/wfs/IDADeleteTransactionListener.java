@@ -81,10 +81,11 @@ public class IDADeleteTransactionListener implements TransactionListener {
 							LOGGER.fine("IDATxLIstener - itemStatus: " + itemStatus);
 						}
 
-						if (itemStatus != null && (itemStatus.equalsIgnoreCase("CREATED") || itemStatus.equalsIgnoreCase("RUNNING")))
+						if (itemStatus != null && itemStatus.equals("RUNNING"))
 						{
-							LOGGER.severe("Exception occurred during Deletion: Could not remove a feature in status 'RUNNING' or 'CREATED'");
-							throw new WFSException("Exception occurred during Deletion: Could not remove a feature in status 'RUNNING' or 'CREATED'");
+							LOGGER.severe("Exception occurred during Deletion: Could not remove a feature in status 'RUNNING'");
+							//throw new WFSException("Exception occurred during Deletion: Could not remove a feature in status 'RUNNING'");
+							continue;
 						}
 						
 						if (wsName != null && storeName != null && itemStatus != null
