@@ -70,6 +70,7 @@ public class IDADeleteTransactionListener implements TransactionListener {
 
 						String wsName = (String) next.getAttribute("wsName");
 						String storeName = (String) next.getAttribute("storeName");
+						String itemStatus = (String) next.getAttribute("itemStatus");
 						String layerName = (String) next.getAttribute("layerName");
 
 						if (LOGGER.isLoggable(Level.FINE))
@@ -77,9 +78,17 @@ public class IDADeleteTransactionListener implements TransactionListener {
 							LOGGER.fine("IDATxLIstener - wsName: " + wsName);
 							LOGGER.fine("IDATxLIstener - storeName: " + storeName);
 							LOGGER.fine("IDATxLIstener - layerName: " + layerName);
+							LOGGER.fine("IDATxLIstener - itemStatus: " + itemStatus);
 						}
 
-						if (wsName != null && storeName != null
+						if (itemStatus != null && (itemStatus.equalsIgnoreCase("CREATED") || itemStatus.equalsIgnoreCase("RUNNING")))
+						{
+							LOGGER.severe("Exception occurred during Deletion: Could not remove a feature in status 'RUNNING' or 'CREATED'");
+							throw new WFSException("Exception occurred during Deletion: Could not remove a feature in status 'RUNNING' or 'CREATED'");
+						}
+						
+						if (wsName != null && storeName != null && itemStatus != null
+								&& itemStatus.equals("COMPLETED")
 								&& wsName.length() > 0
 								&& storeName.length() > 0) {
 							// being sure the workspace exists in the catalog
@@ -118,7 +127,7 @@ public class IDADeleteTransactionListener implements TransactionListener {
 														LOGGER.fine("IDATxLIstener - going to check layer: " + li.getName() + " against feture layer attribute: " + layerName);
 													}
 	
-							                		if (layerName != null && li != null && li.getName() != null && li.getName().startsWith(layerName))
+							                		if (layerName != null && li != null && li.getName() != null && li.getName().equals(layerName))
 								                	{
 								                		catalog.remove(li);
 								                		catalog.remove(li.getResource());
@@ -140,7 +149,7 @@ public class IDADeleteTransactionListener implements TransactionListener {
 											LOGGER.fine("IDATxLIstener - remaining layers for this store: " + layersInStore);
 										}
 								        
-								        if (layersInStore == 0)
+								        if (layersInStore == 0 && storeInfo.getName().equals(storeName))
 								        {
 								        	//geoServer.reload();
 								        	catalog.remove(storeInfo);

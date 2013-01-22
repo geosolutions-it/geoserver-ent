@@ -155,7 +155,7 @@ public class IDASoundPropagationModelProcess implements GSProcess {
 		attributes.add(new FeatureAttribute("outputUrl", outputUrl.toExternalForm()));
 		attributes.add(new FeatureAttribute("runBegin", runBegin));
 		attributes.add(new FeatureAttribute("runEnd", (runEnd!=null?runEnd:new Date())));
-		attributes.add(new FeatureAttribute("itemStatus", (itemStatus != null ? itemStatus : "CREATED")));
+		attributes.add(new FeatureAttribute("itemStatus", (itemStatus != null ? itemStatus : "RUNNING")));
 		attributes.add(new FeatureAttribute("itemStatusMessage", (itemStatusMessage != null ? itemStatusMessage : "Instrumented by Server")));
 		attributes.add(new FeatureAttribute("wsName", wsName));
 		attributes.add(new FeatureAttribute("storeName", (storeName != null ? storeName : "")));
@@ -371,19 +371,49 @@ public class IDASoundPropagationModelProcess implements GSProcess {
 		final String spmRasterStoreName = FilenameUtils.getBaseName(f.getAbsolutePath());
 		final String spmRasterLayerName = FilenameUtils.getBaseName(f.getAbsolutePath());
 
-		/**
-		 * Import output Octave ASC layer into GeoServer
-		 */
-		ImportProcess importProcess = new ImportProcess(catalog);
-		String result = importProcess.execute(
-				null,
-				coverage,
-				wsName,
-				null,
-				spmRasterLayerName,
-				crs,
-				null,
-				(styleName!=null?styleName:"spm"));
+		String result = null;
+		try
+		{
+			/**
+			 * Import output Octave ASC layer into GeoServer
+			 */
+			ImportProcess importProcess = new ImportProcess(catalog);
+			result = importProcess.execute(
+					null,
+					coverage,
+					wsName,
+					null,
+					spmRasterLayerName,
+					crs,
+					null,
+					(styleName!=null?styleName:"spm"));
+			
+		}
+		catch (Exception e)
+		{
+			/**
+    		 * Update Feature Attributes and LOG into the DB
+    		 */
+            filter = ff.equals(ff.property("ftUUID"), ff.literal(uuid.toString()));
+
+            SimpleFeature feature = SimpleFeatureBuilder.copy(features.subCollection(filter).toArray(new SimpleFeature[1])[0]);
+            
+            // build the feature
+            feature.setAttribute("runEnd", new Date());
+            feature.setAttribute("itemStatus", "FAILED");
+            feature.setAttribute("itemStatusMessage", e.getLocalizedMessage());
+            
+            ListFeatureCollection output = new ListFeatureCollection(features.getSchema());
+            output.add(feature);
+    		
+    		features = wfsLogProcess.execute(output, DEFAULT_TYPE_NAME, wsName, storeName, filter, false, new NullProgressListener());
+
+    		if (progressListener != null)
+    		{
+    			progressListener.exceptionOccurred(e);
+    		}
+			throw new ProcessException(e);
+		}
 		
 		if (result == null || !result.contains(spmRasterLayerName))
 		{
