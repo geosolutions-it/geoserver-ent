@@ -21,7 +21,7 @@
 		<gt.version>9-SNAPSHOT</gt.version>
 		<jetty-version>6.1.8</jetty-version>
 		<spring.version>2.5.5</spring.version>
-		<imageio-ext.version>1.1.4</imageio-ext.version>
+		<imageio-ext.version>1.1.6</imageio-ext.version>
 	</properties>
 
 	<dependencyManagement>
