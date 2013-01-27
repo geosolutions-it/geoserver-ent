@@ -4,6 +4,7 @@ import it.geosolutions.geoserver.jms.JMSEventHandler;
 import it.geosolutions.geoserver.jms.JMSEventHandlerSPI;
 import it.geosolutions.geoserver.jms.JMSManager;
 import it.geosolutions.geoserver.jms.JMSProperties;
+import it.geosolutions.geoserver.jms.events.ToggleProducer.ToggleEvent;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -11,6 +12,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -19,8 +21,11 @@ import javax.jms.Session;
 import javax.jms.StreamMessage;
 
 import org.apache.commons.io.IOUtils;
+import org.geoserver.platform.ContextLoadedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
 import org.springframework.jms.listener.SessionAwareMessageListener;
 import org.vfny.geoserver.global.GeoserverDataDirectory;
 
@@ -35,12 +40,14 @@ import org.vfny.geoserver.global.GeoserverDataDirectory;
  * @author Carlo Cancellieri - carlo.cancellieri@geo-solutions.it
  * 
  */
-public class JMSQueueListener implements SessionAwareMessageListener {
+public class JMSQueueListener implements SessionAwareMessageListener,ApplicationListener {
 
 	final static Logger LOGGER = LoggerFactory
 			.getLogger(JMSQueueListener.class);
 
 	private JMSProperties properties;
+	
+	private AtomicBoolean initialized= new AtomicBoolean();
 
 	/**
 	 * @return the properties
@@ -201,6 +208,29 @@ public class JMSQueueListener implements SessionAwareMessageListener {
 		} else
 			throw new JMSException(
 					"Unrecognized message type for catalog incoming event");
+	}
+
+	@Override
+	public void onApplicationEvent(ApplicationEvent event) {
+		if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug("Incoming event of type "
+					+ event.getClass().getSimpleName());
+		}
+	
+		// event coming from the GeoServer application when the configuration
+		// load process is complete
+		if (event instanceof ContextLoadedEvent) {
+			boolean oldValue=initialized.getAndSet(true);
+			if(!oldValue){
+				if (LOGGER.isWarnEnabled()) {
+					LOGGER.warn("Activating JMS Catalog event publisher since the GeoServer context has been loaded. This GeoServer act as a master via the following class: "+this.getClass().getSimpleName());
+					LOGGER.warn("Clustering Properties: "+this.properties.toString());
+				}				
+			}
+
+	
+		} 
+		
 	}
 
 }

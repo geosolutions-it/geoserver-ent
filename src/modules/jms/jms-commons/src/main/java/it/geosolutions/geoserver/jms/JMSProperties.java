@@ -24,12 +24,22 @@ public class JMSProperties {
 	 * 
 	 */
 	private static final long serialVersionUID = -8795336081993259009L;
+
+	public final static String SERVER_NAME_KEY = "SERVER";
 	
 	private Properties properties;
 	
 	private String name;
 	
-	public final static String SERVER_NAME_KEY = "SERVER";
+	private String brokerURL;
+	
+	public String getBrokerURL() {
+		return brokerURL;
+	}
+
+	public void setBrokerURL(String brokerURL) {
+		this.brokerURL = brokerURL;
+	}
 	
 	@Override
 	public Object clone(){

@@ -47,20 +47,9 @@
 <!--	</bean>-->
 	
 	<bean id="JMSProperties" class="it.geosolutions.geoserver.jms.JMSProperties" depends-on="jmsPropertyConfigurer">
-<!--		<constructor-arg index="0" type="String" value="${instance.name}" />-->
 		<property name="name" value="${instance.name}" />
-<!--		<constructor-arg name="name" value="${instance.name}" />-->
+		<property name="brokerURL" value="${broker.url}" />
 	</bean>
-
-	<!-- the merge is specified on the *child* collection definition -->
-	<!-- <bean id="Properties" parent="JMSProperties"> -->
-	<!-- <property name="properties"> -->
-	<!-- <props merge="true"> -->
-	<!-- <prop key="sales">sales@example.com</prop> -->
-	<!-- <prop key="support">support@example.co.uk</prop> -->
-	<!-- </props> -->
-	<!-- </property> -->
-	<!-- </bean> -->
 
 	<bean id="JMSManager" class="it.geosolutions.geoserver.jms.JMSManager"
 		lazy-init="false" />
