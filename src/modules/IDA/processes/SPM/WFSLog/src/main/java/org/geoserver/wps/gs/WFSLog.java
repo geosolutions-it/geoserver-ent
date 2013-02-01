@@ -138,12 +138,11 @@ public class WFSLog implements GSProcess {
 			targetSRSCode = "EPSG:4326";
 			srsHandling = ProjectionPolicy.FORCE_DECLARED;
 		} else {
-			CoordinateReferenceSystem nativeCrs = gd
-					.getCoordinateReferenceSystem();
+			CoordinateReferenceSystem nativeCrs = gd.getCoordinateReferenceSystem();
 			if (nativeCrs == null) {
-				throw new ProcessException(
-						"The original data has no native CRS, "
-								+ "you need to specify the srs parameter");
+				//throw new ProcessException("The original data has no native CRS, you need to specify the srs parameter");
+				targetSRSCode = "EPSG:4326";
+				srsHandling = ProjectionPolicy.FORCE_DECLARED;
 			} else {
 				try {
 					Integer code = CRS.lookupEpsgCode(nativeCrs, true);

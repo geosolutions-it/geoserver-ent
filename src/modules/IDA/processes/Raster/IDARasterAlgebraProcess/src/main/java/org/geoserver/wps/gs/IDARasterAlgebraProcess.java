@@ -16,7 +16,6 @@ import org.geoserver.catalog.WorkspaceInfo;
 import org.geoserver.config.GeoServer;
 import org.geoserver.wps.ppio.FeatureAttribute;
 import org.geoserver.wps.raster.algebra.RasterAlgebraProcess;
-import org.geoserver.wps.raster.algebra.ResolutionChoice;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.imageio.GeoToolsWriteParams;
@@ -137,6 +136,7 @@ public class IDARasterAlgebraProcess implements GSProcess {
 			@DescribeParameter(name = "layerName", min = 0, description = "RasterAlgebra attribute layerName") String layerName,
 			@DescribeParameter(name = "styleName", min = 0, description = "RasterAlgebra attribute styleName") String styleName,
 			@DescribeParameter(name = "classification", description = "RasterAlgebra attribute classification") String classification,
+			@DescribeParameter(name = "areaOfInterest", min = 0, description = "RasterAlgebra attribute ROI") Geometry areaOfInterest,
 			@DescribeParameter(name = "attributeFilter", description = "RasterAlgebra attribute attributeFilter") Filter attributeFilter,
 			ProgressListener progressListener) throws ProcessException {
 
@@ -243,7 +243,7 @@ public class IDARasterAlgebraProcess implements GSProcess {
 		try
 		{
 			RasterAlgebraProcess rstAlgebraProcess = new RasterAlgebraProcess(catalog);
-			coverage = rstAlgebraProcess.execute(attributeFilter, null, ResolutionChoice.getDefault());
+			coverage = rstAlgebraProcess.execute(attributeFilter, areaOfInterest, null);
 			
 			if (coverage == null)
 			{
