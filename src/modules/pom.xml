@@ -186,21 +186,6 @@
 			</modules>
 		</profile>
 		<!-- ======================================== -->
-		<!-- JSON DescribeFeatureType Output Format -->
-		<!-- ======================================== -->
-		<profile>
-			<id>geojsondescribe</id>
-			<activation>
-				<property>
-					<name>all</name>
-					<value>true</value>
-				</property>
-			</activation>
-			<modules>
-				<module>geojsondescribe</module>
-			</modules>
-		</profile>
-		<!-- ======================================== -->
 		<!-- JMS -->
 		<!-- ======================================== -->
 		<profile>
