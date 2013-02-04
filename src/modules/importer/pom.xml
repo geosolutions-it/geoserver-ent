@@ -20,42 +20,5 @@
 		<module>core</module>
 		<module>web</module>
 	</modules>
-
-	<profiles>
-		<profile>
-			<!-- This profile activates Oracle support for good, useful to make a 
-				.war with store and driver -->
-			<id>oracle</id>
-			<dependencies>
-				<dependency>
-					<groupId>org.geotools.jdbc</groupId>
-					<artifactId>gt-jdbc-oracle</artifactId>
-					<version>${gt.version}</version>
-				</dependency>
-				<dependency>
-					<groupId>com.oracle</groupId>
-					<artifactId>ojdbc14</artifactId>
-					<version>10.2.0.3.0</version>
-				</dependency>
-			</dependencies>
-		</profile>
-		<profile>
-			<!-- This profile activates SQL server support for good, useful to make 
-				a .war with store and driver -->
-			<id>sqlserver</id>
-			<dependencies>
-				<dependency>
-					<groupId>org.geotools.jdbc</groupId>
-					<artifactId>gt-jdbc-sqlserver</artifactId>
-					<version>${gt.version}</version>
-				</dependency>
-				<dependency>
-					<groupId>com.microsoft</groupId>
-					<artifactId>sqljdbc</artifactId>
-					<version>3.0</version>
-				</dependency>
-			</dependencies>
-		</profile>
-	</profiles>
-
+	
 </project>

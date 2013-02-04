@@ -96,19 +96,16 @@
 			<groupId>org.mortbay.jetty</groupId>
 			<artifactId>jetty</artifactId>
 			<scope>test</scope>
-			<version>6.1.8</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mortbay.jetty</groupId>
 			<artifactId>jetty-naming</artifactId>
 			<scope>test</scope>
-			<version>6.1.8</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mortbay.jetty</groupId>
 			<artifactId>jetty-plus</artifactId>
 			<scope>test</scope>
-			<version>6.1.8</version>
 		</dependency>
 	</dependencies>
 
