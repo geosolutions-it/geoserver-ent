@@ -240,24 +240,6 @@
 		</dependencies>
 	</profile>
 <!-- ======================================= -->
-<!-- GeoJson Info -->
-<!-- ======================================= -->
-	<profile>
-		<id>geojsoninfo</id>
-		<activation>
-			<property>
-				<name>all</name>
-				<value>true</value>
-			</property>
-		</activation>
-		<dependencies>
-			<dependency>
-				<groupId>it.geosolutions.geoserver</groupId>
-				<artifactId>geojsoninfo</artifactId>
-			</dependency>
-		</dependencies>
-	</profile>
-<!-- ======================================= -->
 <!-- Importer -->
 <!-- ======================================= -->
 	<profile>

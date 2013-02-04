@@ -171,21 +171,6 @@
 			</modules>
 		</profile>
 		<!-- ======================================== -->
-		<!-- GeoJSON Info Output FOrmat -->
-		<!-- ======================================== -->
-		<profile>
-			<id>geojsoninfo</id>
-			<activation>
-				<property>
-					<name>all</name>
-					<value>true</value>
-				</property>
-			</activation>
-			<modules>
-				<module>geojsoninfo</module>
-			</modules>
-		</profile>
-		<!-- ======================================== -->
 		<!-- JMS -->
 		<!-- ======================================== -->
 		<profile>
