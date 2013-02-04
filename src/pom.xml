@@ -32,34 +32,11 @@
 		<jetty-version>6.1.8</jetty-version>
 		<spring.version>3.1.1.RELEASE</spring.version>
 		<imageio-ext.version>1.1.6</imageio-ext.version>
+    <sde.version>9.3</sde.version>
 	</properties>
 
 	<dependencyManagement>
 		<dependencies>
-			<!-- ======================================== -->
-			<!-- WMS-ND -->
-			<!-- ======================================== -->
-			<dependency>
-				<groupId>it.geosolutions.geoserver</groupId>
-				<artifactId>wms-nd</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<!-- ======================================== -->
-			<!-- GeoJSON Info Output FOrmat -->
-			<!-- ======================================== -->
-			<dependency>
-				<groupId>it.geosolutions.geoserver</groupId>
-				<artifactId>geojsoninfo</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<!-- ======================================== -->
-			<!-- GeoJSON Info Output FOrmat -->
-			<!-- ======================================== -->
-			<dependency>
-				<groupId>it.geosolutions.geoserver</groupId>
-				<artifactId>geojsondescribe</artifactId>
-				<version>${project.version}</version>
-			</dependency>
 			<!-- ======================================== -->
 			<!-- Turbo JPEG -->
 			<!-- ======================================== -->
