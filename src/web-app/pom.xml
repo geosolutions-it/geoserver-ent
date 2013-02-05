@@ -33,11 +33,11 @@
     </dependency>
     
     <!-- other extension modules we want to pack in -->
-    <!--dependency>
+    <dependency>
       <groupId>org.geoserver.extension</groupId>
       <artifactId>control-flow</artifactId>
     </dependency>
-    <dependency>
+    <!--dependency>
       <groupId>org.geoserver.extension</groupId>
       <artifactId>oracle</artifactId>
     </dependency>
