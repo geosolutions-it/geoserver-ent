@@ -82,7 +82,7 @@
   
     <build>
     <plugins>
-      <!-- Builds a valid data directory into the web app 
+      <!--Builds a valid data directory into the web app-->
       <plugin>
         <groupId>org.geoserver.maven</groupId>
         <artifactId>config</artifactId>
@@ -107,7 +107,7 @@
             </goals>
           </execution>
         </executions>
-      </plugin-->
+      </plugin>
       <plugin>
         <groupId>org.mortbay.jetty</groupId>
         <artifactId>maven-jetty-plugin</artifactId>
