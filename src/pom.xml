@@ -187,6 +187,17 @@
 				<artifactId>web-app</artifactId>
 				<version>${gs.version}</version>
 			</dependency>
+			
+      <dependency>
+        <groupId>org.geoserver</groupId>
+        <artifactId>gwc</artifactId>
+				<version>${gs.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geoserver.web</groupId>
+        <artifactId>web-gwc</artifactId>
+				<version>${gs.version}</version>
+      </dependency>
 
 			<!-- other extension modules we pack in -->
 			<dependency>

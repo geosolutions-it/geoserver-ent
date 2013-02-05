@@ -16,14 +16,24 @@
 
   <dependencies>
     
-    <!-- Base GeoServer dependency -->
+    <!-- Base GeoServer dependency with GWC exclusion-->
     <dependency>
       <groupId>org.geoserver.web</groupId>
       <artifactId>web-app</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.geoserver</groupId>
+          <artifactId>gwc</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.geoserver.web</groupId>
+          <artifactId>web-gwc</artifactId>
+        </exclusion>        
+      </exclusions>
     </dependency>
     
-    <!-- other extension modules we pack in -->
-    <dependency>
+    <!-- other extension modules we want to pack in -->
+    <!--dependency>
       <groupId>org.geoserver.extension</groupId>
       <artifactId>control-flow</artifactId>
     </dependency>
@@ -50,7 +60,7 @@
     <dependency>
       <groupId>org.geoserver.extension</groupId>
       <artifactId>querylayer</artifactId>
-    </dependency>                      
+    </dependency-->                      
     
    <!-- Jetty test dependencies to start GeoServer from an IDE -->
     <dependency>
@@ -69,7 +79,7 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
+  
     <build>
     <plugins>
       <!-- Builds a valid data directory into the web app 
@@ -186,6 +196,30 @@
 			</dependency>
 		</dependencies>
 	</profile>
+
+<!-- ======================================= -->
+<!-- Including GWC is still possible via a profile gwc -->
+<!-- ======================================= -->    
+      <profile>
+        <id>gwc</id>
+        <activation>
+          <property>
+            <name>all</name>
+            <value>true</value>
+          </property>
+        </activation>
+        <dependencies>
+          <dependency>
+            <groupId>org.geoserver</groupId>
+            <artifactId>gwc</artifactId>
+          </dependency>
+          <dependency>
+            <groupId>org.geoserver.web</groupId>
+            <artifactId>web-gwc</artifactId>
+          </dependency>
+        </dependencies>
+      </profile>
+    	
 <!-- ======================================= -->
 <!-- JMS Server -->
 <!-- ======================================= -->
