@@ -137,7 +137,7 @@ public class IDARasterAlgebraProcess implements GSProcess {
 			@DescribeParameter(name = "styleName", min = 0, description = "RasterAlgebra attribute styleName") String styleName,
 			@DescribeParameter(name = "classification", description = "RasterAlgebra attribute classification") String classification,
 			@DescribeParameter(name = "areaOfInterest", min = 0, description = "RasterAlgebra attribute ROI") Geometry areaOfInterest,
-			@DescribeParameter(name = "attributeFilter", description = "RasterAlgebra attribute attributeFilter") Filter attributeFilter,
+			@DescribeParameter(name = "attributeFilter", description = "RasterAlgebra attribute attributeFilter") String attributeFilter,
 			ProgressListener progressListener) throws ProcessException {
 
 		// first off, decide what is the target store
