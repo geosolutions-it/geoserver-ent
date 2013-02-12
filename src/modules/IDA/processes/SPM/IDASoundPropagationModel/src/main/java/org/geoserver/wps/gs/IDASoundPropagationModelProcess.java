@@ -280,6 +280,10 @@ public class IDASoundPropagationModelProcess implements GSProcess {
 					}
             	}
             }
+            else
+            {
+            	data.put("soundVelocityProfile", "");
+            }
             data.put("sourceDepth", sourceDepth);
             data.put("sourceFrequency", sourceFrequency);
             data.put("sourcePressureLevel", sourcePressureLevel);
