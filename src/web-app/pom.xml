@@ -243,24 +243,6 @@
 		</dependencies>
 	</profile>
 <!-- ======================================= -->
-<!-- Turbo JPEG -->
-<!-- ======================================= -->
-	<profile>
-		<id>turbojpeg</id>
-		<activation>
-			<property>
-				<name>all</name>
-				<value>true</value>
-			</property>
-		</activation>
-		<dependencies>
-			<dependency>
-				<groupId>it.geosolutions.geoserver</groupId>
-				<artifactId>turboJPEG</artifactId>
-			</dependency>
-		</dependencies>
-	</profile>
-<!-- ======================================= -->
 <!-- Importer -->
 <!-- ======================================= -->
 	<profile>

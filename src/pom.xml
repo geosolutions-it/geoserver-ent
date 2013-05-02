@@ -38,15 +38,6 @@
 	<dependencyManagement>
 		<dependencies>
 			<!-- ======================================== -->
-			<!-- Turbo JPEG -->
-			<!-- ======================================== -->
-			<dependency>
-				<groupId>it.geosolutions.geoserver</groupId>
-				<artifactId>turboJPEG</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-
-			<!-- ======================================== -->
 			<!-- Backup Restore -->
 			<!-- ======================================== -->
 			<dependency>

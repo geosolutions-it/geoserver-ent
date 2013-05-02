@@ -27,21 +27,6 @@
 
 	<profiles>
 		<!-- ======================================== -->
-		<!-- Turbo JPEG -->
-		<!-- ======================================== -->
-		<profile>
-			<id>turbojpeg</id>
-			<activation>
-				<property>
-					<name>all</name>
-					<value>true</value>
-				</property>
-			</activation>
-			<modules>
-				<module>turboJPEG</module>
-			</modules>
-		</profile>
-		<!-- ======================================== -->
 		<!-- JMS -->
 		<!-- ======================================== -->
 		<profile>
