@@ -10,8 +10,18 @@ import it.geosolutions.geoserver.jms.impl.handlers.JMSEventHandlerImpl;
 import javax.jms.JMSException;
 
 import org.geoserver.catalog.CatalogInfo;
+import org.geoserver.catalog.event.CatalogAddEvent;
 import org.geoserver.catalog.event.CatalogEvent;
+import org.geoserver.catalog.event.CatalogModifyEvent;
+import org.geoserver.catalog.event.CatalogPostModifyEvent;
+import org.geoserver.catalog.event.CatalogRemoveEvent;
+import org.geoserver.catalog.event.impl.CatalogAddEventImpl;
+import org.geoserver.catalog.event.impl.CatalogEventImpl;
+import org.geoserver.catalog.event.impl.CatalogModifyEventImpl;
+import org.geoserver.catalog.event.impl.CatalogPostModifyEventImpl;
+import org.geoserver.catalog.event.impl.CatalogRemoveEventImpl;
 import org.geoserver.catalog.impl.CatalogImpl;
+import org.geoserver.catalog.impl.ModificationProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,8 +64,41 @@ public abstract class JMSCatalogEventHandler extends
 	}
 
 	@Override
-	public String serialize(CatalogEvent  event) throws Exception {
-		return xstream.toXML(event);
+	public String serialize(CatalogEvent  event) throws Exception {			
+		return xstream.toXML(unwrapSource(event));
+	}
+
+	/**
+	 * @param event
+	 * @return
+	 */
+	private Object unwrapSource(CatalogEvent event) {
+		CatalogInfo info = ModificationProxy.unwrap(event.getSource());
+		CatalogEvent cloned = cloneEvent(event, info);
+		return cloned;
+	}
+
+	/**
+	 * @param event
+	 * @param info
+	 * @return
+	 */
+	private CatalogEvent cloneEvent(CatalogEvent event, CatalogInfo info) {
+		CatalogEventImpl cloned = null;
+		if(event instanceof CatalogAddEvent) {
+			cloned = new CatalogAddEventImpl();
+		} else if(event instanceof CatalogModifyEvent) {
+			cloned = new CatalogModifyEventImpl();
+		} else if(event instanceof CatalogPostModifyEvent) {
+			cloned = new CatalogPostModifyEventImpl();
+		} else if(event instanceof CatalogRemoveEvent) {
+			cloned = new CatalogRemoveEventImpl();
+		}
+		if(cloned != null) {
+			cloned.setSource(info);
+			return cloned;
+		}
+		return event;
 	}
 
 	@Override

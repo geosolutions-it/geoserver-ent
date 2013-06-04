@@ -220,7 +220,7 @@ public abstract class CatalogUtils {
 		}
 		
 		try {
-			info.getLayers().addAll(localizeLayers(info.getLayers(), catalog));
+			info.getLayers().addAll(localizeLayers(info.layers(), catalog));
 		} catch (IllegalAccessException e) {
 			if (LOGGER.isErrorEnabled())
 				LOGGER.error(e.getLocalizedMessage(),e);
@@ -232,7 +232,7 @@ public abstract class CatalogUtils {
 		}
 		
 		// localize layers
-		info.getStyles().addAll(localizeStyles(new HashSet<StyleInfo>(info.getStyles()), catalog));
+		// info.getStyles().addAll(localizeStyles(new HashSet<StyleInfo>(info.getStyles()), catalog));
 
 		// attach to the catalog
 		final CatalogBuilder builder = new CatalogBuilder(catalog);
