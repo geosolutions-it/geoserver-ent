@@ -42,6 +42,11 @@ public class IDASoundPropagationModelProcessTest extends GeoServerTestSupport {
         			2.0,
         			null,
         			null,
+        			null,
+        			null,
+        			null,
+        			null,
+        			null,
         			footprint,
         			new NullProgressListener()
         			);

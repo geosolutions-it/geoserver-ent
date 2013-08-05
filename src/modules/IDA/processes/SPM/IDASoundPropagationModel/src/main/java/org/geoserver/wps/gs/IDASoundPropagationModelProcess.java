@@ -93,6 +93,11 @@ public class IDASoundPropagationModelProcess implements GSProcess {
 			@DescribeParameter(name = "sourceFrequency", description = "SPM attribute sourceFrequency") Double sourceFrequency,
 			@DescribeParameter(name = "sourcePressureLevel", description = "SPM attribute src_pressure_level") Double sourcePressureLevel,
 			@DescribeParameter(name = "soundVelocityProfile", min = 0, description = "SPM attribute soundVelocityProfile") String soundVelocityProfile,
+			@DescribeParameter(name = "svpSourceUnit", min = 0, description = "SPM attribute soundVelocityProfile location") Point svpSourceUnit,
+			@DescribeParameter(name = "tlModel", min = 0, description = "SPM attribute tlModel") String tlModel,
+			@DescribeParameter(name = "bottomType", min = 0, description = "SPM attribute bottomType") String bottomType,
+			@DescribeParameter(name = "quality", min = 0, description = "SPM attribute quality") String quality,
+			@DescribeParameter(name = "maxRange", min = 0, description = "SPM attribute maxRange") Double maxRange,
 			@DescribeParameter(name = "advParams", min = 0, description = "SPM attribute advancedParams (par1;par2)") String advParams,
 			@DescribeParameter(name = "soundSourceUnit", description = "SPM attribute footprint") Point soundSourceUnit,
 			ProgressListener progressListener) throws ProcessException {
@@ -166,6 +171,12 @@ public class IDASoundPropagationModelProcess implements GSProcess {
 		attributes.add(new FeatureAttribute("sourceFrequency", (sourceFrequency != null ? sourceFrequency : 0.0)));
 		attributes.add(new FeatureAttribute("sourcePressureLevel", (sourcePressureLevel != null ? sourcePressureLevel : 0.0)));
 		attributes.add(new FeatureAttribute("soundVelocityProfile", (soundVelocityProfile != null ? soundVelocityProfile : "")));
+		attributes.add(new FeatureAttribute("svpSourceUnitX", (svpSourceUnit != null ? svpSourceUnit.getX() : 0.0)));
+		attributes.add(new FeatureAttribute("svpSourceUnitY", (svpSourceUnit != null ? svpSourceUnit.getY() : 0.0)));
+		attributes.add(new FeatureAttribute("tlModel", (tlModel != null ? tlModel : "")));
+		attributes.add(new FeatureAttribute("bottomType", (bottomType != null ? bottomType : "")));
+		attributes.add(new FeatureAttribute("quality", (quality != null ? quality : "")));
+		attributes.add(new FeatureAttribute("maxRange", (maxRange != null ? maxRange : 0.0)));
 
 		SimpleFeatureCollection features = toFeatureProcess.execute(soundSourceUnit, crs, DEFAULT_TYPE_NAME, attributes, null);
 		
@@ -265,7 +276,7 @@ public class IDASoundPropagationModelProcess implements GSProcess {
             data.put("season", season);
             if(soundVelocityProfile!=null && !soundVelocityProfile.isEmpty())
             {
-            	File sndProfilePath = new File(soundVelocityProfile);
+            	File sndProfilePath = new File(idaExecProperties.getProperty("input.profiles.upload.folder"), soundVelocityProfile);
             	
             	if(sndProfilePath.exists() && sndProfilePath.isFile() && !sndProfilePath.isDirectory() && sndProfilePath.canWrite())
             	{
@@ -279,11 +290,38 @@ public class IDASoundPropagationModelProcess implements GSProcess {
 						data.put("soundVelocityProfile", "<-- ERROR occurred while processing the input sound velocity profile file -->");
 					}
             	}
+            	else
+            	{
+            		data.put("soundVelocityProfile", "<-- ERROR occurred while processing the input sound velocity profile file -->");
+            	}
             }
             else
             {
             	data.put("soundVelocityProfile", "");
             }
+            
+            if (svpSourceUnit != null)
+            {
+                data.put("svpSourceUnitX", nff.format(svpSourceUnit.getX()));
+                data.put("svpSourceUnitY", nff.format(svpSourceUnit.getY()));            	
+            } else {
+                data.put("svpSourceUnitX", nff.format(0.0));
+                data.put("svpSourceUnitY", nff.format(0.0));            	
+            }
+
+            data.put("tlModel", sourceDepth);
+            data.put("bottomType", sourceDepth);
+            data.put("quality", sourceDepth);
+
+            if (maxRange != null)
+            {
+            	data.put("maxRange", nff.format(maxRange));
+            }
+            else
+            {
+            	data.put("maxRange", maxRange);
+            }
+            
             data.put("sourceDepth", sourceDepth);
             data.put("sourceFrequency", sourceFrequency);
             data.put("sourcePressureLevel", sourcePressureLevel);
